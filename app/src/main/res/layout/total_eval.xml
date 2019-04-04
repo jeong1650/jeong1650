@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+              <LinearLayout
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_marginLeft="20dp"
+                  android:layout_marginTop="20dp"
+                  android:orientation="horizontal">
+
+                     <TextView
+                         android:layout_width="200dp"
+                         android:layout_height="wrap_content"
+                         android:text="반드시 채용"
+                         android:textSize="20dp"
+                         android:id="@+id/ep_1"/>
+
+                     <RadioButton
+                         android:id="@+id/eva_1"
+                         android:layout_width="wrap_content"
+                         android:layout_height="wrap_content" />
+
+                     <ExpandableListView
+                         android:layout_width="wrap_content"
+                         android:layout_height="wrap_content"
+                         android:id="@+id/ex_1">
+
+                     </ExpandableListView>
+
+              </LinearLayout>
+
+              <LinearLayout
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_marginLeft="20dp"
+                  android:layout_marginTop="20dp"
+                  android:orientation="horizontal">
+
+                     <TextView
+                         android:layout_width="200dp"
+                         android:layout_height="wrap_content"
+                         android:text="채용 추천"
+                         android:textSize="20dp" />
+
+                     <RadioButton
+                         android:id="@+id/eva_2"
+                         android:layout_width="wrap_content"
+                         android:layout_height="wrap_content" />
+
+                     <ExpandableListView
+                         android:layout_width="wrap_content"
+                         android:layout_height="wrap_content"
+                         android:id="@+id/ex_2">
+
+                     </ExpandableListView>
+
+              </LinearLayout>
+
+              <LinearLayout
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_marginLeft="20dp"
+                  android:layout_marginTop="20dp"
+                  android:orientation="horizontal">
+
+                     <TextView
+                         android:layout_width="200dp"
+                         android:layout_height="wrap_content"
+                         android:text="채용 가능"
+                         android:textSize="20dp" />
+
+                     <RadioButton
+                         android:id="@+id/eva_3"
+                         android:layout_width="wrap_content"
+                         android:layout_height="wrap_content" />
+
+                     <ExpandableListView
+                         android:layout_width="wrap_content"
+                         android:layout_height="wrap_content"
+                         android:id="@+id/ex_3">
+
+                     </ExpandableListView>
+
+              </LinearLayout>
+
+              <LinearLayout
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_marginLeft="20dp"
+                  android:layout_marginTop="20dp"
+                  android:orientation="horizontal">
+
+                     <TextView
+                         android:layout_width="200dp"
+                         android:layout_height="wrap_content"
+                         android:text="채용 유보"
+                         android:textSize="20dp" />
+
+                     <RadioButton
+                         android:id="@+id/eva_4"
+                         android:layout_width="wrap_content"
+                         android:layout_height="wrap_content" />
+
+                     <ExpandableListView
+                         android:layout_width="wrap_content"
+                         android:layout_height="wrap_content"
+                         android:id="@+id/ex_4">
+
+                     </ExpandableListView>
+
+              </LinearLayout>
+
+              <LinearLayout
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_marginLeft="20dp"
+                  android:layout_marginTop="20dp"
+                  android:orientation="horizontal">
+
+                     <TextView
+                         android:layout_width="200dp"
+                         android:layout_height="wrap_content"
+                         android:text="채용 불가"
+                         android:textSize="20dp" />
+
+                     <RadioButton
+                         android:id="@+id/eva_5"
+                         android:layout_width="wrap_content"
+                         android:layout_height="wrap_content" />
+
+                     <ExpandableListView
+                         android:layout_width="wrap_content"
+                         android:layout_height="wrap_content"
+                         android:id="@+id/ex_5">
+
+                     </ExpandableListView>
+
+              </LinearLayout>
+
+</LinearLayout>
