@@ -1,14 +1,15 @@
 package com.example.kaon.ims;
 
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -78,6 +79,7 @@ public class WaitpersonFragment extends Fragment implements SwipeRefreshLayout.O
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        new loading().execute();
         View view = inflater.inflate(R.layout.waitperson,container,false);
         in1 = new AddCookiesInterceptor(getActivity());
         httpClient = new OkHttpClient.Builder().addInterceptor(in1)
@@ -158,24 +160,15 @@ public class WaitpersonFragment extends Fragment implements SwipeRefreshLayout.O
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-
-                builder.setTitle("응답 오류")
-                        .setMessage("통신 오류가 발생하였습니다. 다시 시도해주세요")
-                        .setCancelable(false)
-                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.cancel();
-
-                            }
-                        });
-
-
-                AlertDialog dialog = builder.create();
-                //다이어로그 생성
-                dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND); //dim처리
-                dialog.show();
+                final ErrorDialog errorDialog = new ErrorDialog(getActivity());
+                errorDialog.setErrorDialogListener(new ErrorDialog.ErrorDialogListener() {
+                    @Override
+                    public void checkClick() {
+                        errorDialog.cancel();
+                    }
+                });
+                errorDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                errorDialog.show();
             }
         });
 
@@ -254,26 +247,47 @@ public class WaitpersonFragment extends Fragment implements SwipeRefreshLayout.O
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-
-                builder.setTitle("응답 오류")
-                        .setMessage("통신 오류가 발생하였습니다. 다시 시도해주세요")
-                        .setCancelable(false)
-                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.cancel();
-
-                            }
-                        });
-
-
-                AlertDialog dialog = builder.create();
-                //다이어로그 생성
-                dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND); //dim처리
-                dialog.show();
+                final ErrorDialog errorDialog = new ErrorDialog(getActivity());
+                errorDialog.setErrorDialogListener(new ErrorDialog.ErrorDialogListener() {
+                    @Override
+                    public void checkClick() {
+                        errorDialog.cancel();
+                    }
+                });
+                errorDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                errorDialog.show();
             }
         });
         mSwipeRefreshLayout.setRefreshing(false);
+    }
+
+    private class loading extends AsyncTask<Void, Void, Void> {
+        CustomProgressDialog progressDialog = new CustomProgressDialog(getActivity());
+        @Override
+        protected void onPreExecute() {
+            progressDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            progressDialog.show();
+            super.onPreExecute();
+        }
+
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+
+                Thread.sleep(1000);
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            progressDialog.dismiss();
+            super.onPostExecute(aVoid);
+        }
+
     }
 }

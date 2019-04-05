@@ -8,6 +8,8 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
+import com.example.kaon.ims.R;
+
 public class PasswordDialog extends Dialog implements View.OnClickListener {
 
     private Button positivebtn;

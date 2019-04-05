@@ -1,15 +1,15 @@
 package com.example.kaon.ims;
 
 import android.annotation.SuppressLint;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AlertDialog;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.util.TypedValue;
@@ -22,11 +22,6 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.example.kaon.ims.AddCookiesInterceptor;
-import com.example.kaon.ims.ApiService;
-import com.example.kaon.ims.PersonInfoActivity;
-import com.example.kaon.ims.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -68,6 +63,10 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
     String pot_sch;
     String strt;
 
+    String refreshdate;
+
+    Boolean Todaycheck = true;
+
     String project;
     ArrayList<String> projectlist;
     String et;
@@ -92,6 +91,7 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
     String selectedDateStr;
     SwipeRefreshLayout mSwipeRefreshLayout;
     String p_place;
+    String Todaydate;
     public ScheduleFragment(){
 
     }
@@ -107,6 +107,9 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
+        new loading().execute();
+
         View view = inflater.inflate(R.layout.interview_schedule,container,false);
 
         in1 = new AddCookiesInterceptor(getActivity());
@@ -191,7 +194,7 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
 //                })
                 .build();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        final String Todaydate = format.format(System.currentTimeMillis());
+        Todaydate = format.format(System.currentTimeMillis());
 
 
         Log.d(TAG, Todaydate);
@@ -371,31 +374,24 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-                builder.setTitle("응답 오류")
-                        .setMessage("통신 오류가 발생하였습니다. 다시 시도해주세요")
-                        .setCancelable(false)
-                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.cancel();
+                final ErrorDialog errorDialog = new ErrorDialog(getActivity());
+                errorDialog.setErrorDialogListener(new ErrorDialog.ErrorDialogListener() {
+                    @Override
+                    public void checkClick() {
+                        errorDialog.cancel();
 
-                            }
-                        });
-
-
-                AlertDialog dialog = builder.create();
-                //다이어로그 생성
-                dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND); //dim처리
-                dialog.show();
+                    }
+                });
+                errorDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                errorDialog.show();
             }
         });
 
         horizontalCalendar.setCalendarListener(new HorizontalCalendarListener() {
             @Override
             public void onDateSelected(Calendar date, int position) {
-
+                Todaycheck = false;
                selectedDateStr = DateFormat.format("yyyy-MM-dd", date).toString();
                 Log.i("onDateSelected", selectedDateStr + " - Position = " + position);
 
@@ -549,11 +545,6 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
                             }
 
 
-//
-//                            if (result.equals("[]")) {
-//                               infotime.removeAllViews();
-//
-//                            }
                         } catch (IOException e) {
                             e.printStackTrace();
                         } catch (JSONException e) {
@@ -568,24 +559,16 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
 
                     @Override
                     public void onFailure(Call<ResponseBody> call, Throwable t) {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-
-                        builder.setTitle("응답 오류")
-                                .setMessage("통신 오류가 발생하였습니다. 다시 시도해주세요")
-                                .setCancelable(false)
-                                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.cancel();
-
-                                    }
-                                });
-
-
-                        AlertDialog dialog = builder.create();
-                        //다이어로그 생성
-                        dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND); //dim처리
-                        dialog.show();
+//
+                        final ErrorDialog errorDialog = new ErrorDialog(getActivity());
+                        errorDialog.setErrorDialogListener(new ErrorDialog.ErrorDialogListener() {
+                            @Override
+                            public void checkClick() {
+                                errorDialog.cancel();
+                            }
+                        });
+                        errorDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                        errorDialog.show();
                     }
                 });
 
@@ -600,6 +583,12 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
     @Override
     public void onRefresh() {
 
+        if(Todaycheck == true){
+           refreshdate = Todaydate;
+        } else{
+            refreshdate = selectedDateStr;
+        }
+
         infotime.removeAllViews();
         retrofit = new Retrofit.Builder().baseUrl(ApiService.API_URL)
                 .client(httpClient)
@@ -608,7 +597,7 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
 
         final HashMap<String, String> Schedule = new HashMap<>();
         Schedule.put("USER_ID", username);
-        Schedule.put("INT_DATE", selectedDateStr);
+        Schedule.put("INT_DATE", refreshdate);
 
         apiService.Schedule(Schedule).enqueue(new Callback<ResponseBody>() {
             @SuppressLint("ResourceAsColor")
@@ -769,26 +758,48 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-
-                builder.setTitle("응답 오류")
-                        .setMessage("통신 오류가 발생하였습니다. 다시 시도해주세요")
-                        .setCancelable(false)
-                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.cancel();
-
-                            }
-                        });
-
-
-                AlertDialog dialog = builder.create();
-                //다이어로그 생성
-                dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND); //dim처리
-                dialog.show();
+//
+                final ErrorDialog errorDialog = new ErrorDialog(getActivity());
+                errorDialog.setErrorDialogListener(new ErrorDialog.ErrorDialogListener() {
+                    @Override
+                    public void checkClick() {
+                        errorDialog.cancel();
+                    }
+                });
+                errorDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                errorDialog.show();
             }
         });
         mSwipeRefreshLayout.setRefreshing(false);
+    }
+
+    private class loading extends AsyncTask<Void, Void, Void>{
+        CustomProgressDialog progressDialog = new CustomProgressDialog(getActivity());
+        @Override
+        protected void onPreExecute() {
+            progressDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            progressDialog.show();
+            super.onPreExecute();
+        }
+
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+
+                Thread.sleep(1000);
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            progressDialog.dismiss();
+            super.onPostExecute(aVoid);
+        }
+
     }
 }

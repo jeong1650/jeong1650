@@ -182,30 +182,8 @@ public class LoginActivity extends AppCompatActivity {
                         }
                        else{
                             failtext.setVisibility(View.VISIBLE);
-//                            AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
-//
-//                            builder.setTitle("로그인 실패")
-//                                    .setMessage("아이디와 비밀번호를 확인해주세요")
-//                                    .setCancelable(false)
-//                                    .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-//                                        @Override
-//                                        public void onClick(DialogInterface dialog, int which) {
-//                                            dialog.cancel();
-//
-//                                        }
-//                                    });
-//
-//
-//                            AlertDialog dialog = builder.create();
-//                            //다이어로그 생성
-//                            dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND); //dim처리
-//                            dialog.show();
-
-
                             failtext.setText("아이디와 비밀번호를 확인해주세요");
-//                            failtext = new TextView(LoginActivity.this);
-//                            failtext.setText("아이디와 비밀번호를 확인해주세요");
-//                            Loginfail.addView(failtext,login);
+
 
                         }
                     } catch (IOException e) {
@@ -239,24 +217,15 @@ public class LoginActivity extends AppCompatActivity {
                 @Override
                 public void onFailure(Call<ResponseBody> call, Throwable t) {
 
-                    AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
-
-                    builder.setTitle("응답 오류")
-                            .setMessage("통신 오류가 발생하였습니다. 다시 시도해주세요")
-                            .setCancelable(false)
-                            .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.cancel();
-
-                                }
-                            });
-
-
-                    AlertDialog dialog = builder.create();
-                    //다이어로그 생성
-                    dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND); //dim처리
-                    dialog.show();
+                    final ErrorDialog errorDialog = new ErrorDialog(LoginActivity.this);
+                    errorDialog.setErrorDialogListener(new ErrorDialog.ErrorDialogListener() {
+                        @Override
+                        public void checkClick() {
+                            errorDialog.cancel();
+                        }
+                    });
+                    errorDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                    errorDialog.show();
                 }
             });
 

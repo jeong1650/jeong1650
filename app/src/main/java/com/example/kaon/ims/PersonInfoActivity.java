@@ -1,7 +1,6 @@
 package com.example.kaon.ims;
 
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -12,7 +11,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Window;
@@ -197,24 +195,15 @@ public class PersonInfoActivity extends AppCompatActivity implements SwipeRefres
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(PersonInfoActivity.this);
-
-                builder.setTitle("응답 오류")
-                        .setMessage("통신 오류가 발생하였습니다. 다시 시도해주세요")
-                        .setCancelable(false)
-                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.cancel();
-
-                            }
-                        });
-
-
-                AlertDialog dialog = builder.create();
-                //다이어로그 생성
-                dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND); //dim처리
-                dialog.show();
+                final ErrorDialog errorDialog = new ErrorDialog(PersonInfoActivity.this);
+                errorDialog.setErrorDialogListener(new ErrorDialog.ErrorDialogListener() {
+                    @Override
+                    public void checkClick() {
+                        errorDialog.cancel();
+                    }
+                });
+                errorDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                errorDialog.show();
 
             }
 
@@ -322,24 +311,15 @@ public class PersonInfoActivity extends AppCompatActivity implements SwipeRefres
 
                 @Override
                 public void onFailure(Call<ResponseBody> call, Throwable t) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(PersonInfoActivity.this);
-
-                    builder.setTitle("응답 오류")
-                            .setMessage("통신 오류가 발생하였습니다. 다시 시도해주세요")
-                            .setCancelable(false)
-                            .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.cancel();
-
-                                }
-                            });
-
-
-                    AlertDialog dialog = builder.create();
-                    //다이어로그 생성
-                    dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND); //dim처리
-                    dialog.show();
+                    final ErrorDialog errorDialog = new ErrorDialog(PersonInfoActivity.this);
+                    errorDialog.setErrorDialogListener(new ErrorDialog.ErrorDialogListener() {
+                        @Override
+                        public void checkClick() {
+                            errorDialog.cancel();
+                        }
+                    });
+                    errorDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                    errorDialog.show();
 
                 }
 

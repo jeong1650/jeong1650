@@ -3,7 +3,6 @@ package com.example.kaon.ims;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -22,8 +21,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -76,7 +73,6 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
     String STATUS;
     String INDEX_ID;
     String interviewercheck;
-
 
 
     LinearLayout Eval_View;
@@ -147,13 +143,10 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
         Window window = getWindow();
 
 
-
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 
 
-
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-
 
 
         window.setStatusBarColor(Color.parseColor("#4e67c3"));
@@ -289,49 +282,36 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
                     try {
                         int result = Integer.parseInt(response.body().string());
                         if (result == 1) {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(AssessActivity.this);
 
-                            builder.setTitle("완료")
-                                    .setMessage("임시저장하였습니다.")
-                                    .setCancelable(false)
-                                    .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            Intent intent = new Intent(AssessActivity.this, PersonInfoActivity.class);
-                                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                            intent.putExtra("NAME", project_name);
-                                            intent.putExtra("username", userid);
-                                            AssessActivity.this.startActivity(intent);
-
-
-                                        }
-                                    });
-                            AlertDialog dialog = builder.create();
-                            //다이어로그 생성
-                            dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND); //dim처리
-                            dialog.show();
+                            TempDialog tempDialog = new TempDialog(AssessActivity.this);
+                            tempDialog.setTempDialogListener(new TempDialog.TempDialogListener() {
+                                @Override
+                                public void checkClick() {
+                                    Intent intent = new Intent(AssessActivity.this, PersonInfoActivity.class);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    intent.putExtra("NAME", project_name);
+                                    intent.putExtra("username", userid);
+                                    AssessActivity.this.startActivity(intent);
+                                }
+                            });
+                            tempDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                            tempDialog.show();
 
                         } else if (result == 0) {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(AssessActivity.this);
 
-                            builder.setTitle("제출완료")
-                                    .setMessage("이미 제출이 되었습니다.")
-                                    .setCancelable(false)
-                                    .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            Intent intent = new Intent(AssessActivity.this, PersonInfoActivity.class);
-                                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                            intent.putExtra("NAME", project_name);
-                                            intent.putExtra("username", userid);
-                                            AssessActivity.this.startActivity(intent);
-
-                                        }
-                                    });
-                            AlertDialog dialog = builder.create();
-                            //다이어로그 생성
-                            dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND); //dim처리
-                            dialog.show();
+                            OnefinishedDialog onefinishedDialog = new OnefinishedDialog(AssessActivity.this);
+                            onefinishedDialog.setOnefinishedDialogListener(new OnefinishedDialog.OnefinishedDialogListener() {
+                                @Override
+                                public void checkClick() {
+                                    Intent intent = new Intent(AssessActivity.this, PersonInfoActivity.class);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    intent.putExtra("NAME", project_name);
+                                    intent.putExtra("username", userid);
+                                    AssessActivity.this.startActivity(intent);
+                                }
+                            });
+                            onefinishedDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                            onefinishedDialog.show();
 
                         }
 
@@ -344,24 +324,15 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
 
                 @Override
                 public void onFailure(Call<ResponseBody> call, Throwable t) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(AssessActivity.this);
-
-                    builder.setTitle("응답 오류")
-                            .setMessage("통신 오류가 발생하였습니다. 다시 시도해주세요")
-                            .setCancelable(false)
-                            .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.cancel();
-
-                                }
-                            });
-
-
-                    AlertDialog dialog = builder.create();
-                    //다이어로그 생성
-                    dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND); //dim처리
-                    dialog.show();
+                    final ErrorDialog errorDialog = new ErrorDialog(AssessActivity.this);
+                    errorDialog.setErrorDialogListener(new ErrorDialog.ErrorDialogListener() {
+                        @Override
+                        public void checkClick() {
+                            errorDialog.cancel();
+                        }
+                    });
+                    errorDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                    errorDialog.show();
                 }
             });
 
@@ -369,60 +340,39 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
         } else if (id == R.id.Btn_save) {
 
             if (q_ea != count && q_ea != checkcount) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(AssessActivity.this);
 
-                builder.setTitle("알림")
-                        .setMessage("문항을 다 체크해주세요")
-                        .setCancelable(false)
-                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.cancel();
-
-
-                            }
-                        });
-                AlertDialog dialog = builder.create();
-                //다이어로그 생성
-                dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND); //dim처리
-                dialog.show();
+                final Tablecheck tablecheck = new Tablecheck(AssessActivity.this);
+                tablecheck.setTablecheckListener(new Tablecheck.TablecheckListener() {
+                    @Override
+                    public void checkClick() {
+                        tablecheck.cancel();
+                        tablecheck.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                    }
+                });
+                tablecheck.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                tablecheck.show();
             } else if (ea != 1) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(AssessActivity.this);
 
-                builder.setTitle("알림")
-                        .setMessage("종합평가를 체크해주세요")
-                        .setCancelable(false)
-                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.cancel();
-
-
-                            }
-                        });
-                AlertDialog dialog = builder.create();
-                //다이어로그 생성
-                dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND); //dim처리
-                dialog.show();
-
+                final Tablecheck tablecheck = new Tablecheck(AssessActivity.this);
+                tablecheck.setTablecheckListener(new Tablecheck.TablecheckListener() {
+                    @Override
+                    public void checkClick() {
+                        tablecheck.cancel();
+                    }
+                });
+                tablecheck.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                tablecheck.show();
             } else if (getEdit.equals("")) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(AssessActivity.this);
 
-                builder.setTitle("알림")
-                        .setMessage("종합의견을 작성해주세요")
-                        .setCancelable(false)
-                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.cancel();
-
-
-                            }
-                        });
-                AlertDialog dialog = builder.create();
-                //다이어로그 생성
-                dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND); //dim처리
-                dialog.show();
+                final Tablecheck tablecheck = new Tablecheck(AssessActivity.this);
+                tablecheck.setTablecheckListener(new Tablecheck.TablecheckListener() {
+                    @Override
+                    public void checkClick() {
+                        tablecheck.cancel();
+                    }
+                });
+                tablecheck.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                tablecheck.show();
             } else {
                 checkMethod();
             }
@@ -463,39 +413,27 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
                                 if (result == 0) {
 
                                     if (!name.equals(userid)) {
-                                        AlertDialog.Builder builder = new AlertDialog.Builder(AssessActivity.this);
 
-                                        builder.setTitle("실패")
-                                                .setMessage("이름을 올바르게 입력하세요")
-                                                .setCancelable(false)
-                                                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialog, int which) {
-                                                        dialog.cancel();
-
-                                                    }
-                                                });
-                                        AlertDialog dialog = builder.create();
-                                        //다이어로그 생성
-                                        dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND); //dim처리
-                                        dialog.show();
+                                        final InfocheckDialog infocheckDialog = new InfocheckDialog(AssessActivity.this);
+                                        infocheckDialog.setInfocheckDialogListener(new InfocheckDialog.InfocheckDialogListener() {
+                                            @Override
+                                            public void checkClick() {
+                                                infocheckDialog.dismiss();
+                                            }
+                                        });
+                                        infocheckDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                                        infocheckDialog.show();
                                     } else {
-                                        AlertDialog.Builder builder = new AlertDialog.Builder(AssessActivity.this);
-
-                                        builder.setTitle("실패")
-                                                .setMessage("패스워드가 틀렸습니다.")
-                                                .setCancelable(false)
-                                                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialog, int which) {
-                                                        dialog.cancel();
-
-                                                    }
-                                                });
-                                        AlertDialog dialog = builder.create();
-                                        //다이어로그 생성
-                                        dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND); //dim처리
-                                        dialog.show();
+//
+                                        final InfocheckDialog infocheckDialog = new InfocheckDialog(AssessActivity.this);
+                                        infocheckDialog.setInfocheckDialogListener(new InfocheckDialog.InfocheckDialogListener() {
+                                            @Override
+                                            public void checkClick() {
+                                                infocheckDialog.dismiss();
+                                            }
+                                        });
+                                        infocheckDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                                        infocheckDialog.show();
                                     }
 
 
@@ -505,65 +443,44 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
                             } catch (IOException e) {
                                 e.printStackTrace();
                             } catch (NullPointerException e) {
-                                AlertDialog.Builder builder = new AlertDialog.Builder(AssessActivity.this);
 
-                                builder.setTitle("입력 알림")
-                                        .setMessage("정보를 올바르게 입력하세요")
-                                        .setCancelable(false)
-                                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                dialog.cancel();
-
-                                            }
-                                        });
-                                AlertDialog dialog = builder.create();
-                                //다이어로그 생성
-                                dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND); //dim처리
-                                dialog.show();
+                                final RightCheckdialog rightCheckdialog = new RightCheckdialog(AssessActivity.this);
+                                rightCheckdialog.setRightCheckdialogListener(new RightCheckdialog.RightCheckdialogListener() {
+                                    @Override
+                                    public void checkClick() {
+                                        rightCheckdialog.dismiss();
+                                    }
+                                });
+                                rightCheckdialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                                rightCheckdialog.show();
                             }
                         }
 
                         @Override
                         public void onFailure(Call<ResponseBody> call, Throwable t) {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(AssessActivity.this);
-
-                            builder.setTitle("응답 오류")
-                                    .setMessage("통신 오류가 발생하였습니다. 다시 시도해주세요")
-                                    .setCancelable(false)
-                                    .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            dialog.cancel();
-
-                                        }
-                                    });
-
-
-                            AlertDialog dialog = builder.create();
-                            //다이어로그 생성
-                            dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND); //dim처리
-                            dialog.show();
+                            final ErrorDialog errorDialog = new ErrorDialog(AssessActivity.this);
+                            errorDialog.setErrorDialogListener(new ErrorDialog.ErrorDialogListener() {
+                                @Override
+                                public void checkClick() {
+                                    errorDialog.cancel();
+                                }
+                            });
+                            errorDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                            errorDialog.show();
                         }
                     });
 
                 } else {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(AssessActivity.this);
 
-                    builder.setTitle("체크")
-                            .setMessage("본인 확인을 체크해주세요")
-                            .setCancelable(false)
-                            .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.cancel();
-
-                                }
-                            });
-                    AlertDialog dialog = builder.create();
-                    //다이어로그 생성
-                    dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND); //dim처리
-                    dialog.show();
+                    final Checkdialog checkdialog = new Checkdialog(AssessActivity.this);
+                    checkdialog.setcheckDialogListener(new Checkdialog.CheckDialogListener() {
+                        @Override
+                        public void checkClick() {
+                            checkdialog.dismiss();
+                        }
+                    });
+                    checkdialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                    checkdialog.show();
                 }
 
             }
@@ -622,27 +539,20 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
                                         JSONObject ma = new JSONObject(String.valueOf(master));
                                         TOTAL_SCORE = ma.getInt("TOTAL_SCORE");
 
-                                        AlertDialog.Builder builder = new AlertDialog.Builder(AssessActivity.this);
+                                        final Submitdialog submitdialog = new Submitdialog(AssessActivity.this);
+                                        submitdialog.setSubmitdialogListener(new Submitdialog.SubmitdialogListener() {
+                                            @Override
+                                            public void checkClick() {
+                                                Intent intent = new Intent(AssessActivity.this, PersonInfoActivity.class);
+                                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                                intent.putExtra("NAME", project_name);
+                                                intent.putExtra("username", userid);
+                                                AssessActivity.this.startActivity(intent);
+                                            }
+                                        });
+                                        submitdialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                                        submitdialog.show();
 
-                                        builder.setTitle("완료")
-                                                .setMessage("평가표를 성공적으로 제출하였습니다. 정보 확인 후 확인버튼을 눌러주세요.")
-                                                .setCancelable(false)
-
-                                                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialog, int which) {
-                                                        Intent intent = new Intent(AssessActivity.this, PersonInfoActivity.class);
-                                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                                        intent.putExtra("NAME", project_name);
-                                                        intent.putExtra("username", userid);
-                                                        AssessActivity.this.startActivity(intent);
-
-                                                    }
-                                                });
-                                        AlertDialog dialog = builder.create();
-                                        //다이어로그 생성
-                                        dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND); //dim처리
-                                        dialog.show();
 
 
                                     }
@@ -657,51 +567,33 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
 
                             @Override
                             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                                AlertDialog.Builder builder = new AlertDialog.Builder(AssessActivity.this);
-
-                                builder.setTitle("응답 오류")
-                                        .setMessage("통신 오류가 발생하였습니다. 다시 시도해주세요")
-                                        .setCancelable(false)
-                                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                dialog.cancel();
-
-                                            }
-                                        });
-
-
-                                AlertDialog dialog = builder.create();
-                                //다이어로그 생성
-                                dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND); //dim처리
-                                dialog.show();
+                                final ErrorDialog errorDialog = new ErrorDialog(AssessActivity.this);
+                                errorDialog.setErrorDialogListener(new ErrorDialog.ErrorDialogListener() {
+                                    @Override
+                                    public void checkClick() {
+                                        errorDialog.cancel();
+                                    }
+                                });
+                                errorDialog.show();
                             }
                         });
 
 
                     } else if (result == 0) {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(AssessActivity.this);
 
-                        builder.setTitle("제출완료")
-                                .setMessage("이미 제출이 되었습니다.")
-                                .setCancelable(false)
-                                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-
-                                        Intent intent = new Intent(AssessActivity.this, PersonInfoActivity.class);
-                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                        intent.putExtra("NAME", project_name);
-                                        intent.putExtra("username", userid);
-                                        AssessActivity.this.startActivity(intent);
-
-
-                                    }
-                                });
-                        AlertDialog dialog = builder.create();
-                        //다이어로그 생성
-                        dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND); //dim처리
-                        dialog.show();
+                        OnefinishedDialog onefinishedDialog = new OnefinishedDialog(AssessActivity.this);
+                        onefinishedDialog.setOnefinishedDialogListener(new OnefinishedDialog.OnefinishedDialogListener() {
+                            @Override
+                            public void checkClick() {
+                                Intent intent = new Intent(AssessActivity.this, PersonInfoActivity.class);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                intent.putExtra("NAME", project_name);
+                                intent.putExtra("username", userid);
+                                AssessActivity.this.startActivity(intent);
+                            }
+                        });
+                        onefinishedDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                        onefinishedDialog.show();
 
                     }
                 } catch (IOException e) {
@@ -713,19 +605,15 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(AssessActivity.this);
-
-                builder.setTitle("응답 오류")
-                        .setMessage("통신 오류가 발생하였습니다. 다시 시도해주세요")
-                        .setCancelable(false)
-                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.cancel();
-
-
-                            }
-                        });
+                final ErrorDialog errorDialog = new ErrorDialog(AssessActivity.this);
+                errorDialog.setErrorDialogListener(new ErrorDialog.ErrorDialogListener() {
+                    @Override
+                    public void checkClick() {
+                        errorDialog.cancel();
+                    }
+                });
+                errorDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                errorDialog.show();
             }
         });
 
@@ -792,8 +680,6 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
                                     ConList.add(CONTENTS);
                                     Scorelist.add(SCORE);
                                     Totalscore.add(SCORE);
-
-
                                     Log.d(TAG, String.valueOf(Scorelist));
 
                                 }
@@ -813,14 +699,11 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
                                     eval_title.setTextColor(0xff000000);
                                     Eval_View.addView(eval_title);
                                     q_ea++;
-
                                 } else {
                                     eval_question = new TextView(AssessActivity.this);
                                     eval_question.setText(con);
                                     eval_question.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
-
                                     Eval_View.addView(eval_question);
-
 
                                     LinearLayout radiobtn = new LinearLayout(AssessActivity.this);
                                     radiobtn.setOrientation(LinearLayout.HORIZONTAL);
@@ -833,8 +716,6 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
                                     Check5 = new RadioButton(AssessActivity.this);
                                     Check5.setText("5");
                                     Check5.setId(R.id.check_five);
-
-
                                     if (x == 5) {
                                         Check5.setChecked(true);
                                     }
@@ -877,12 +758,8 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
                                     Group.addView(Check2);
                                     Group.addView(Check1);
 
-
                                     Eval_View.addView(radiobtn);
-
                                     Group.setTag(n);
-
-
                                     Group.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 
                                         @Override
@@ -894,15 +771,12 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
                                                     break;
                                                 case R.id.check_four:
                                                     Scorelist.set(tag, 4);
-
                                                     break;
                                                 case R.id.check_three:
                                                     Scorelist.set(tag, 3);
-
                                                     break;
                                                 case R.id.check_two:
                                                     Scorelist.set(tag, 2);
-
                                                     break;
                                                 case R.id.check_one:
                                                     Scorelist.set(tag, 1);
@@ -917,8 +791,7 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
                                                 }
                                             }
                                             Log.d(TAG, String.valueOf(Scorelist));
-                                            Log.d(TAG, String.valueOf(checkcount
-                                            ));
+                                            Log.d(TAG, String.valueOf(checkcount));
 
 
                                         }
@@ -1027,22 +900,15 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
 
                 @Override
                 public void onFailure(Call<ResponseBody> call, Throwable t) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(AssessActivity.this);
-
-                    builder.setTitle("응답 오류")
-                            .setMessage("통신 오류가 발생하였습니다. 다시 시도해주세요")
-                            .setCancelable(false)
-                            .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.cancel();
-
-                                }
-                            });
-                    AlertDialog dialog = builder.create();
-                    //다이어로그 생성
-                    dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND); //dim처리
-                    dialog.show();
+                    final ErrorDialog errorDialog = new ErrorDialog(AssessActivity.this);
+                    errorDialog.setErrorDialogListener(new ErrorDialog.ErrorDialogListener() {
+                        @Override
+                        public void checkClick() {
+                            errorDialog.cancel();
+                        }
+                    });
+                    errorDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                    errorDialog.show();
                 }
             });
 

@@ -110,6 +110,7 @@ public class MainScreenActivity extends AppCompatActivity {
                     scheduleFragment.setUsername(mName);
                     scheduleFragment.setIdvalue(idValue);
                     return scheduleFragment;
+
                 case 1:
                     WaitpersonFragment waitpersonFragment = new WaitpersonFragment();
                     waitpersonFragment.setUsername(mName);
@@ -120,8 +121,11 @@ public class MainScreenActivity extends AppCompatActivity {
                     noticeFragment.setUsername(mName);
                     noticeFragment.setId(idValue);
                     return noticeFragment;
-
                 case 3:
+                    NotingFragment notingFragment = new NotingFragment();
+                    return notingFragment;
+
+                case 4:
                     LogoutFragment logoutFragment = new LogoutFragment();
                     return logoutFragment;
 
@@ -149,7 +153,7 @@ public class MainScreenActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            return mPageCount;
+            return 5;
         }
     }
 
