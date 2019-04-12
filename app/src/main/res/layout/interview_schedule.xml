@@ -6,7 +6,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:fitsSystemWindows="true"
     tools:context=".PreviousActivity.MainActivity"
-    android:background="#ece8e8">
+    android:background="#FBFBFB">
+
     <android.support.v4.widget.SwipeRefreshLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -50,7 +51,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/frame"
-    android:background="#ece8e8">
+    android:background="#FBFBFB">
 
             <LinearLayout
                 android:id="@+id/re_view"

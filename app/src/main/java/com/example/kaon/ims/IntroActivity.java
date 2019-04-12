@@ -20,6 +20,7 @@ public class IntroActivity  extends Activity {
           @Override
           public void run() {
               Intent Loginintent = new Intent(IntroActivity.this, LoginActivity.class);
+              Loginintent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
               IntroActivity.this.startActivity(Loginintent);
               IntroActivity.this.finish();
           }

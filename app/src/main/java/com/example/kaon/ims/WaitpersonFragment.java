@@ -15,7 +15,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,10 +56,13 @@ public class WaitpersonFragment extends Fragment implements SwipeRefreshLayout.O
     String Master_ID;
     //List
 
+    LinearLayout Totalwailtlayout;
+
     List<Waitpersonitem> infoList;
 
-    TextView totla_title;
+
     FloatingActionButton logout;
+    TextView Notdata;
 
     SwipeRefreshLayout mSwipeRefreshLayout;
     private ProgressDialog pDialog;
@@ -90,8 +95,12 @@ public class WaitpersonFragment extends Fragment implements SwipeRefreshLayout.O
 
         mTitle.setText("서류대기자");
 
+        Notdata = (TextView) view.findViewById(R.id.notdata);
+
         mSwipeRefreshLayout = view.findViewById(R.id.swipe_wait);
         mSwipeRefreshLayout.setOnRefreshListener(this);
+
+        Totalwailtlayout = (LinearLayout) view.findViewById(R.id.waitlayout);
 
         retrofit = new Retrofit.Builder().baseUrl(ApiService.API_URL)
                 .client(httpClient)
@@ -107,7 +116,8 @@ public class WaitpersonFragment extends Fragment implements SwipeRefreshLayout.O
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 try {
                     String result = response.body().string();
-                    if (result != null) {
+                    if (!result.equals("[]")) {
+                        Notdata.setVisibility(View.GONE);
                         JSONArray jsonArray = new JSONArray(result);
                         infoList = new ArrayList<Waitpersonitem>();
 
@@ -138,6 +148,9 @@ public class WaitpersonFragment extends Fragment implements SwipeRefreshLayout.O
                         }
 
 
+                    } else {
+                        Notdata.setVisibility(View.VISIBLE);
+                        Notdata.setText("아직 대기중인 인원이 없습니다.");
                     }
                 }catch (final NullPointerException e){
                     e.printStackTrace();
@@ -194,7 +207,8 @@ public class WaitpersonFragment extends Fragment implements SwipeRefreshLayout.O
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 try {
                     String result = response.body().string();
-                    if (result != null) {
+                    if (!result.equals("[]")) {
+                        Notdata.setVisibility(View.GONE);
                         JSONArray jsonArray = new JSONArray(result);
                         infoList = new ArrayList<Waitpersonitem>();
 
@@ -225,6 +239,9 @@ public class WaitpersonFragment extends Fragment implements SwipeRefreshLayout.O
                         }
 
 
+                    } else{
+                        Notdata.setVisibility(View.VISIBLE);
+                        Notdata.setText("아직 대기중인 인원이 없습니다.");
                     }
                 }catch (final NullPointerException e){
                     e.printStackTrace();

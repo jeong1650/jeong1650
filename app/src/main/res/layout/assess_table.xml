@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="#d0d9d3">
+    android:background="#f3f7f4">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -20,12 +20,23 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
-
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="평가하기"
+                android:textSize="20dp"
+                android:textStyle="bold"
+                android:layout_gravity="center"/>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#000000"/>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginTop="10dp">
+                android:layout_marginTop="10dp"
+                android:background="#C3CBEA">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -71,30 +82,49 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
                 android:layout_marginTop="30dp"
-                android:text="종합평가"
-                android:textSize="25dp" />
+                android:text="종합평가(1개 선택)"
+                android:textSize="25dp"
+                android:textStyle="bold"
+                />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#000000"/>
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
-            <include layout="@layout/total_eval"></include>
+            <!--<include layout="@layout/total_eval"></include>-->
+                <ExpandableListView
+                    android:id="@+id/ex_list"
+                    android:layout_width="320dp"
+                    android:layout_height="300dp">
 
-
+                </ExpandableListView>
+             <include layout="@layout/right"></include>
             </LinearLayout>
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
                 android:layout_marginTop="30dp"
                 android:text="종합의견"
+                android:textStyle="bold"
                 android:textSize="25dp" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#000000"/>
 
             <EditText
+                android:layout_marginTop="10dp"
                 android:id="@+id/opinion"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_edittext"
                 android:hint="내용을 입력해주세요"
+                android:textColorHint="#B4B4B4"
                 android:inputType="textMultiLine"
                 android:lines="5"
                 android:scrollbars="vertical" />
@@ -104,13 +134,15 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
                 android:orientation="horizontal"
-                android:id="@+id/total_btn">
+                android:id="@+id/total_btn"
+                android:layout_marginTop="10dp">
 
                 <Button
                     android:id="@+id/Btn_cancel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="취소하기"
+                    android:textColor="#707070"
                     android:background="@drawable/button_cancel"/>
 
                 <Button
@@ -120,7 +152,7 @@
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
                     android:text="임시저장"
-                    android:textColor="#f7f6f6"
+                    android:textColor="#F6F6F6"
                     android:background="@drawable/button_temp"/>
 
                 <Button
@@ -128,7 +160,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="제출하기"
-                    android:textColor="#f7f6f6"
+                    android:textColor="#FFFFFF"
                     android:background="@drawable/button_save"/>
 
 

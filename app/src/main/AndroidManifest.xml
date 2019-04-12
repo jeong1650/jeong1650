@@ -23,7 +23,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainScreenActivity"></activity>
-        <activity android:name=".LoginActivity"></activity>
+        <activity android:name=".LoginActivity">
+
+        </activity>
         <activity android:name=".PreviousActivity.WaitPersonActivity"></activity>
         <activity android:name=".PersonInfoActivity"></activity>
         <activity android:name=".AssessActivity"></activity>

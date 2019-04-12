@@ -16,8 +16,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -58,6 +61,8 @@ public class NoticeFragment extends Fragment implements SwipeRefreshLayout.OnRef
         this.username = username;
     }
 
+    TextView notnotice,title;
+
     String id;
     String username;
     Context context;
@@ -80,8 +85,9 @@ public class NoticeFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 .build();
 
         listView = (ListView) view.findViewById(R.id.listview);
+        listView.setFocusable(false);
 
-
+        notnotice = (TextView) view.findViewById(R.id.noticenot);
         Gonglist = new ArrayList<>();
 
         n_scrollView = view.findViewById(R.id.notice_scroll);
@@ -110,7 +116,7 @@ public class NoticeFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
         apiService = retrofit.create(ApiService.class);
 
-        HashMap<String, String> notice = new HashMap<>();
+        final HashMap<String, String> notice = new HashMap<>();
         notice.put("Name", id);
 
         apiService.postData(notice).enqueue(new Callback<ResponseBody>() {
@@ -119,7 +125,8 @@ public class NoticeFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 try {
                     String result = response.body().string();
                     Log.d(TAG, result);
-                    if (result != null) {
+                    if (!result.equals("[]")) {
+                        notnotice.setVisibility(View.GONE);
                         JSONArray jsonArray = new JSONArray(result);
                         NoticeList = new ArrayList<>();
 
@@ -134,6 +141,9 @@ public class NoticeFragment extends Fragment implements SwipeRefreshLayout.OnRef
                         }
                         NoticeAdapter adapter = new NoticeAdapter(getActivity(), R.layout.list_gonggo, NoticeList);
                         listView.setAdapter(adapter);
+                    } else{
+                        notnotice.setVisibility(View.VISIBLE);
+                        notnotice.setText("등록된 공고가 없습니다.");
                     }
                 } catch (final NullPointerException e) {
                     e.printStackTrace();
@@ -199,7 +209,7 @@ public class NoticeFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
         apiService = retrofit.create(ApiService.class);
 
-        HashMap<String, String> notice = new HashMap<>();
+        final HashMap<String, String> notice = new HashMap<>();
         notice.put("Name", id);
 
         apiService.postData(notice).enqueue(new Callback<ResponseBody>() {
@@ -208,7 +218,8 @@ public class NoticeFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 try {
                     String result = response.body().string();
                     Log.d(TAG, result);
-                    if (result != null) {
+                    if (!result.equals("[]")) {
+                        notnotice.setVisibility(View.GONE);
                         JSONArray jsonArray = new JSONArray(result);
                         NoticeList = new ArrayList<>();
 
@@ -223,6 +234,9 @@ public class NoticeFragment extends Fragment implements SwipeRefreshLayout.OnRef
                         }
                         NoticeAdapter adapter = new NoticeAdapter(getActivity(), R.layout.list_gonggo, NoticeList);
                         listView.setAdapter(adapter);
+                    } else{
+                        notnotice.setVisibility(View.VISIBLE);
+                        notnotice.setText("등록된 공고가 없습니다.");
                     }
                 } catch (final NullPointerException e) {
                     e.printStackTrace();

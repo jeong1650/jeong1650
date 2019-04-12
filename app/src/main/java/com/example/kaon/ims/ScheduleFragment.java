@@ -32,8 +32,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 
 import devs.mulham.horizontalcalendar.HorizontalCalendar;
+import devs.mulham.horizontalcalendar.model.CalendarEvent;
+import devs.mulham.horizontalcalendar.utils.CalendarEventsPredicate;
 import devs.mulham.horizontalcalendar.utils.HorizontalCalendarListener;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
@@ -46,7 +49,7 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
     private static final String TAG = "ScheduleActivity";
     ArrayList<HashMap<String, String>> contactList;
     TextView inter_time;
-    private HorizontalCalendar horizontalCalendar;
+    HorizontalCalendar horizontalCalendar;
     Retrofit retrofit;
     ApiService apiService;
     Calendar date;
@@ -92,6 +95,11 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
     SwipeRefreshLayout mSwipeRefreshLayout;
     String p_place;
     String Todaydate;
+
+    Boolean isExistdata = false;
+
+    HorizontalCalendar.Builder builder = null;
+    int height;
     public ScheduleFragment(){
 
     }
@@ -109,8 +117,8 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         new loading().execute();
-
-        View view = inflater.inflate(R.layout.interview_schedule,container,false);
+        height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1, getResources().getDisplayMetrics());
+        final View view = inflater.inflate(R.layout.interview_schedule,container,false);
 
         in1 = new AddCookiesInterceptor(getActivity());
         httpClient = new OkHttpClient.Builder().addInterceptor(in1)
@@ -136,10 +144,12 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
         s_name = (TextView) view.findViewById(R.id.s_name);
         s_position = (TextView) view.findViewById(R.id.s_position);
         infotime = (LinearLayout) view.findViewById(R.id.info_time);
-
+        builder = new HorizontalCalendar.Builder(view, R.id.calendarView);
 //        frm = (FrameLayout) findViewById(R.id.frame);
 
         scv = (ScrollView) view.findViewById(R.id.mainscroll);
+
+
 
         s_timelist = new ArrayList<>();
 //        ArrayList<ScheduleVO> sList = new ArrayList<>();
@@ -156,14 +166,19 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
         startDate.add(Calendar.MONTH, -2);
 
         /* end after 2 months from now */
-        final Calendar endDate = Calendar.getInstance();
+         Calendar endDate = Calendar.getInstance();
         endDate.add(Calendar.MONTH, 2);
 
         // Default Date set to Today.
-        final Calendar defaultSelectedDate = Calendar.getInstance();
+         Calendar defaultSelectedDate = Calendar.getInstance();
+         Log.d(TAG, String.valueOf(defaultSelectedDate));
 
 
-        horizontalCalendar = new HorizontalCalendar.Builder(view, R.id.calendarView)
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+
+
+        Todaydate = format.format(System.currentTimeMillis());
+        horizontalCalendar = builder
                 .range(startDate, endDate)
                 .datesNumberOnScreen(5)
                 .configure()
@@ -178,29 +193,28 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
                 .defaultSelectedDate(defaultSelectedDate)
 //                .addEvents(new CalendarEventsPredicate() {
 //
-//                    Random rnd = new Random();
-//
 //                    @Override
 //                    public List<CalendarEvent> events(Calendar date) {
-//                        List<CalendarEvent> events = new ArrayList<>();
-//                        int count = rnd.nextInt(6);
+//                        final List<CalendarEvent> events = new ArrayList<>();
 //
-//                        for (int i = 0; i <= count; i++) {
-//                            events.add(new CalendarEvent(Color.rgb(rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256)), "event"));
-//                        }
+//                        events.add(new CalendarEvent(Color.YELLOW, "event"));
+//
+//
+//
+//
+////                        }
+//
 //
 //                        return events;
 //                    }
 //                })
                 .build();
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        Todaydate = format.format(System.currentTimeMillis());
-
 
         Log.d(TAG, Todaydate);
         Log.i("Default Date", DateFormat.format("yyyy-MM-dd", defaultSelectedDate).toString());
 
         infotime.removeAllViews();
+
         retrofit = new Retrofit.Builder().baseUrl(ApiService.API_URL)
                 .client(httpClient)
                 .build();
@@ -224,11 +238,12 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
                 try {
                     String result = response.body().string();
 
-                    if (result != null) {
+                    if (!result.equals("[]")) {
+                        isExistdata = true;
+
                         JSONArray jsonArray = new JSONArray(result);
                         for (int i = 0; i < jsonArray.length(); i++) {
                             JSONObject c = jsonArray.getJSONObject(i);
-
                             starttime = c.getString("START_TIME");
                             cutstarttime = starttime.substring(0, 5);
                             endtime = c.getString("END_TIME");
@@ -251,13 +266,18 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
                                 }
                             }
                         }
-                    } else if(result.equals("[]")) {
+                    } else  {
                         LinearLayout.LayoutParams nottotal = new LinearLayout.LayoutParams
                                 (LinearLayout.LayoutParams.MATCH_PARENT,
                                         LinearLayout.LayoutParams.MATCH_PARENT);
-                        TextView notdata = new TextView(getActivity());
-                        notdata.setText("면접일정이 없습니다. 다른 일정을 확인해보세요.");
+                       TextView notdata = new TextView(getActivity());
+                        notdata.setText("면접일정이 없습니다. ");
+                        notdata.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
                         infotime.addView(notdata,nottotal);
+                        TextView notdata2 = new TextView(getActivity());
+                        notdata2.setText("다른 일정을 확인해보세요.");
+                        notdata2.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
+                        infotime.addView(notdata2,nottotal);
                     }
 
                     for (int j = 0; j < s_timelist.size(); j++) {
@@ -272,6 +292,7 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
                         info.setOrientation(LinearLayout.VERTICAL);
                         LinearLayout twohori = new LinearLayout(getActivity());
                         twohori.setOrientation(LinearLayout.HORIZONTAL);
+
 
                         LinearLayout.LayoutParams totalparm = new LinearLayout.LayoutParams
                                 (LinearLayout.LayoutParams.MATCH_PARENT,
@@ -288,11 +309,13 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
                         LinearLayout.LayoutParams smallmargin = new LinearLayout.LayoutParams(
                                 LinearLayout.LayoutParams.WRAP_CONTENT,
                                 LinearLayout.LayoutParams.WRAP_CONTENT);
+                        LinearLayout.LayoutParams viewlayout = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                               height);
 
-                        layoutParams.setMargins(30, 20, 0, 0);
-                        bigmargin.setMargins(40, 20, 0, 0);
+                        layoutParams.setMargins(30, 40, 0, 0);
+                        bigmargin.setMargins(40, 40, 0, 0);
                         smallmargin.setMargins(20, 20, 0, 0);
-                        placemargin.setMargins(30, 20, 0, 0);
+                        placemargin.setMargins(30, 40, 0, 0);
 
                         String st = s_timelist.get(j);
                         et = e_timelist.get(j);
@@ -307,7 +330,10 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
                         start_time.setText(st);
                         start_time.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 50);
                         hori.addView(start_time, layoutParams);
-                        hori.setBackgroundResource(R.drawable.rounded_edittext);
+                        View time = new View(getActivity());
+                        time.setBackground(getResources().getDrawable(R.drawable.background));
+                        total.addView(time,viewlayout);
+//                        hori.setBackgroundResource(R.drawable.rounded_edittext);
 
                         finish_time = new TextView(getActivity());
                         finish_time.setText(" ~ " + et + " 까지");
@@ -349,6 +375,9 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
                                 });
                                 s_name.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 30);
                                 total.addView(s_name, layoutParams);
+                                View infoview = new View(getActivity());
+                                infoview.setBackground(getResources().getDrawable(R.drawable.background));
+                                total.addView(infoview,viewlayout);
 //                                s_position = new TextView(ScheduleActivity.this);
 //                                s_position.setText(pot_sch);
 //                                s_position.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
@@ -406,7 +435,6 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
                 Schedule.put("INT_DATE", selectedDateStr);
 
                 apiService.Schedule(Schedule).enqueue(new Callback<ResponseBody>() {
-                    @SuppressLint("ResourceAsColor")
                     @Override
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
 //                        re_view.setVisibility(View.VISIBLE);
@@ -419,11 +447,12 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
                         try {
                             String result = response.body().string();
 
-                            if (result != null) {
+                            if (!result.equals("[]")) {
+                                isExistdata = true;
+
                                 JSONArray jsonArray = new JSONArray(result);
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     JSONObject c = jsonArray.getJSONObject(i);
-
 
                                     starttime = c.getString("START_TIME");
                                     cutstarttime = starttime.substring(0, 5);
@@ -431,7 +460,6 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
                                     cutendtime = endtime.substring(0, 5);
                                     s_place = c.getString("PLACE");
                                     int_date = c.getString("INT_DATE");
-
 
                                     compar_starttime.add(cutstarttime);
                                     compar_endtime.add(cutendtime);
@@ -447,6 +475,18 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
                                         }
                                     }
                                 }
+                            } else{
+                                LinearLayout.LayoutParams nottotal = new LinearLayout.LayoutParams
+                                        (LinearLayout.LayoutParams.MATCH_PARENT,
+                                                LinearLayout.LayoutParams.MATCH_PARENT);
+                                TextView notdata = new TextView(getActivity());
+                                notdata.setText("면접일정이 없습니다. ");
+                                notdata.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
+                                infotime.addView(notdata,nottotal);
+                                TextView notdata2 = new TextView(getActivity());
+                                notdata2.setText("다른 일정을 확인해보세요.");
+                                notdata2.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
+                                infotime.addView(notdata2,nottotal);
                             }
                             for (int j = 0; j < s_timelist.size(); j++) {
                                 LinearLayout total = new LinearLayout(getActivity());
@@ -475,6 +515,8 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
                                 LinearLayout.LayoutParams smallmargin = new LinearLayout.LayoutParams(
                                         LinearLayout.LayoutParams.WRAP_CONTENT,
                                         LinearLayout.LayoutParams.WRAP_CONTENT);
+                                LinearLayout.LayoutParams viewlayout = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                                        height);
 
 
                                 String st = s_timelist.get(j);
@@ -494,7 +536,10 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
                                 start_time.setText(st);
                                 start_time.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 50);
                                 hori.addView(start_time, layoutParams);
-                                hori.setBackgroundResource(R.drawable.rounded_edittext);
+                                View time = new View(getActivity());
+                                time.setBackground(getResources().getDrawable(R.drawable.background));
+                                total.addView(time,viewlayout);
+//                                hori.setBackgroundResource(R.drawable.rounded_edittext);
 
                                 finish_time = new TextView(getActivity());
                                 finish_time.setText(" ~ " + et + " 까지");
@@ -534,8 +579,11 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
                                         });
                                         s_name.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 30);
                                         total.addView(s_name, layoutParams);
-
+                                        View infoview = new View(getActivity());
+                                        infoview.setBackground(getResources().getDrawable(R.drawable.background));
+                                        total.addView(infoview,viewlayout);
                                     }
+
 
 
 
@@ -549,10 +597,11 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
                             e.printStackTrace();
                         } catch (JSONException e) {
                             e.printStackTrace();
-                        } catch (NullPointerException e) {
-                            e.printStackTrace();
-                            Toast.makeText(getActivity(), "데이터가 없습니다.", Toast.LENGTH_SHORT).show();
                         }
+//                        catch (NullPointerException e) {
+//                            e.printStackTrace();
+//
+//                        }
 
 
                     }
@@ -613,7 +662,8 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
                 try {
                     String result = response.body().string();
 
-                    if (result != null) {
+                    if (!result.equals("[]")) {
+
                         JSONArray jsonArray = new JSONArray(result);
                         for (int i = 0; i < jsonArray.length(); i++) {
                             JSONObject c = jsonArray.getJSONObject(i);
@@ -641,6 +691,18 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
                                 }
                             }
                         }
+                    } else{
+                        LinearLayout.LayoutParams nottotal = new LinearLayout.LayoutParams
+                                (LinearLayout.LayoutParams.MATCH_PARENT,
+                                        LinearLayout.LayoutParams.MATCH_PARENT);
+                        TextView notdata = new TextView(getActivity());
+                        notdata.setText("면접일정이 없습니다. ");
+                        notdata.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
+                        infotime.addView(notdata,nottotal);
+                        TextView notdata2 = new TextView(getActivity());
+                        notdata2.setText("다른 일정을 확인해보세요.");
+                        notdata2.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
+                        infotime.addView(notdata2,nottotal);
                     }
                     for (int j = 0; j < s_timelist.size(); j++) {
                         LinearLayout total = new LinearLayout(getActivity());
@@ -669,6 +731,8 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
                         LinearLayout.LayoutParams smallmargin = new LinearLayout.LayoutParams(
                                 LinearLayout.LayoutParams.WRAP_CONTENT,
                                 LinearLayout.LayoutParams.WRAP_CONTENT);
+                        LinearLayout.LayoutParams viewlayout = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                                height);
 
 
                         String st = s_timelist.get(j);
@@ -688,7 +752,10 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
                         start_time.setText(st);
                         start_time.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 50);
                         hori.addView(start_time, layoutParams);
-                        hori.setBackgroundResource(R.drawable.rounded_edittext);
+                        View time = new View(getActivity());
+                        time.setBackground(getResources().getDrawable(R.drawable.background));
+                        total.addView(time,viewlayout);
+//                        hori.setBackgroundResource(R.drawable.rounded_edittext);
 
                         finish_time = new TextView(getActivity());
                         finish_time.setText(" ~ " + et + " 까지");
@@ -728,12 +795,11 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
                                 });
                                 s_name.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 30);
                                 total.addView(s_name, layoutParams);
+                                View infoview = new View(getActivity());
+                                infoview.setBackground(getResources().getDrawable(R.drawable.background));
+                                total.addView(infoview,viewlayout);
 
                             }
-
-
-
-
 
                         }
                     }

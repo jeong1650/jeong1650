@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/noticelayout"
     tools:context=".PreviousActivity.NoticeActivity">
     <android.support.v4.widget.SwipeRefreshLayout
         android:layout_width="match_parent"
@@ -21,12 +22,19 @@
     android:orientation="vertical">
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="공고 목록"
+        android:layout_height="50dp"
+        android:text="나의 면접자"
         android:gravity="center"
-        android:textSize="40dp"
+        android:textSize="25dp"
         android:textColor="#faf9f9"
         android:background="#4e67c3"/>
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/noticenot"
+        android:textSize="20dp"/>
     <ListView
         android:layout_width="match_parent"
         android:layout_height="700dp"

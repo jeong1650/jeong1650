@@ -12,6 +12,7 @@ import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
@@ -102,6 +103,7 @@ public class PersonInfoActivity extends AppCompatActivity implements SwipeRefres
                 .build();
         mTitle = (TextView) findViewById(R.id.P_title);
         mPerson = (ListView) findViewById(R.id.i_list);
+        mPerson.setFocusable(false);
         masterlist = new ArrayList<>();
 //        Peronlist = new ArrayList<>();
 
@@ -110,6 +112,8 @@ public class PersonInfoActivity extends AppCompatActivity implements SwipeRefres
 //        namelist = intent.getStringArrayListExtra("project");
          Log.d(TAG, String.valueOf(namelist));
         mTitle.setText(mName);
+
+
         username = intent.getStringExtra("username");
 //        prname = intent.getStringExtra("NAME");
 //        in_name = intent.getStringExtra("username");

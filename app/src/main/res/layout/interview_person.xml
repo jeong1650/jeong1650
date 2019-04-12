@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/infolayout">
     <android.support.v4.widget.SwipeRefreshLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -14,19 +15,33 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@color/buttoncolor"
+            android:gravity="center"
+            android:textColor="#faf9f9"
+            android:text="나의 면접자"
+            android:textSize="25dp"/>
 
         <TextView
             android:id="@+id/P_title"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textSize="40dp"
-            android:textColor="#f4f0f0"
-            android:background="@color/buttoncolor"/>
+           android:layout_gravity="center"
+            android:layout_marginTop="15dp"
+            android:textStyle="bold"
+            android:textSize="20dp"
+            android:textColor="#100f0f" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#000000"/>
 
         <ListView
             android:layout_width="match_parent"
             android:layout_height="700dp"
+            android:layout_marginTop="15dp"
             android:id="@+id/i_list">
 
         </ListView>

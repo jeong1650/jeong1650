@@ -1,7 +1,6 @@
 package com.example.kaon.ims;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
@@ -10,7 +9,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -22,10 +20,12 @@ import android.view.WindowManager;
 import android.widget.Button;
 
 import android.widget.EditText;
+import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.ScrollView;
+import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,6 +36,8 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 import okhttp3.OkHttpClient;
@@ -74,8 +76,12 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
     String INDEX_ID;
     String interviewercheck;
 
-
+    Boolean isCount;
+    int check_count;
+    int count;
     LinearLayout Eval_View;
+    int[] checkarray;
+    int[] arraycom;
 
     //retrofit
     Retrofit retrofit;
@@ -99,6 +105,23 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
     RadioButton Check2;
     RadioButton Check1;
 
+    //ExpandableListview
+    public ExpandableListView expandableListView;
+    public ExpandableListviewAdapter expandableListviewAdapter;
+    public ArrayList<String> parentList;
+    public ArrayList<ChildListData> Inputcontents;
+    public ArrayList<ChildListData> Inputcontents2;
+    public ArrayList<ChildListData> Inputcontents3;
+    public ArrayList<ChildListData> Inputcontents4;
+    public ArrayList<ChildListData> Inputcontents5;
+
+    public HashMap<String, ArrayList<ChildListData>> childList;
+
+    private ArrayList<String> mGroupList = null;
+    private ArrayList<ArrayList<String>> mChildList = null;
+    private ArrayList<String> mChildListContent = null;
+    private ExpandableListView mListView;
+
 
     //btn
     Button btn_save;
@@ -112,7 +135,7 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
     ScrollView Asses_scoll;
 
     String getEdit;
-    int count;
+
     int q_ea;
     int checkcount;
     //score
@@ -137,8 +160,14 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.assess_appbar);
+
+
+        check_count = 0;
+        isCount = true;
+        check_count = 0;
+        checkarray = new int[20];
+        check_count = 1;
 
         Window window = getWindow();
 
@@ -149,7 +178,7 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 
 
-        window.setStatusBarColor(Color.parseColor("#4e67c3"));
+        window.setStatusBarColor(Color.parseColor("#D3D3D3"));
         totalbtn = (LinearLayout) findViewById(R.id.total_btn);
         in1 = new AddCookiesInterceptor(this);
         httpClient = new OkHttpClient.Builder().addInterceptor(in1)
@@ -184,12 +213,13 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
         btn_save = (Button) findViewById(R.id.Btn_save);
         btn_Cancel = (Button) findViewById(R.id.Btn_cancel);
         btn_tem = (Button) findViewById(R.id.Btn_temporary);
+        Expandable();
 
-        radioButton1 = (RadioButton) findViewById(R.id.eva_1);
-        radioButton2 = (RadioButton) findViewById(R.id.eva_2);
-        radioButton3 = (RadioButton) findViewById(R.id.eva_3);
-        radioButton4 = (RadioButton) findViewById(R.id.eva_4);
-        radioButton5 = (RadioButton) findViewById(R.id.eva_5);
+        radioButton1 = (RadioButton) findViewById(R.id.eval_1);
+        radioButton2 = (RadioButton) findViewById(R.id.eval_2);
+        radioButton3 = (RadioButton) findViewById(R.id.eval_3);
+        radioButton4 = (RadioButton) findViewById(R.id.eval_4);
+        radioButton5 = (RadioButton) findViewById(R.id.eval_5);
 
         radioButton1.setOnClickListener(this);
         radioButton2.setOnClickListener(this);
@@ -201,8 +231,46 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
         btn_tem.setOnClickListener(this);
         fab.setOnClickListener(this);
 
+
         new JsonEval().execute();
 
+
+    }
+
+    private void Expandable() {
+        parentList = new ArrayList<String>();
+        parentList.add("반드시 채용");
+        parentList.add("채용 추천");
+        parentList.add("채용 가능");
+        parentList.add("채용 유보");
+        parentList.add("채용 불가");
+        ChildListData childData = new ChildListData("꼭 함께 일하고 싶으며, 개인과 회사의 시너지 효과가 극대화 될 것임");
+        Inputcontents = new ArrayList<ChildListData>();
+        Inputcontents.add(childData);
+
+        ChildListData childData2 = new ChildListData("함께 일한다면 성과 창출과 부서 발전에 기여할 것으로 기대됨");
+        Inputcontents2 = new ArrayList<ChildListData>();
+        Inputcontents2.add(childData2);
+
+        ChildListData childData3 = new ChildListData("결점이 뚜렷하게 보이지 않으며 자기 역할을 무난히 수행할 것으로 기대됨");
+        Inputcontents3 = new ArrayList<ChildListData>();
+        Inputcontents3.add(childData3);
+        ChildListData childData4 = new ChildListData("결정적인 단점은 보이지 않으나 함께 일함에 있어 꺼려짐");
+        Inputcontents4 = new ArrayList<ChildListData>();
+        Inputcontents4.add(childData4);
+        ChildListData childData5 = new ChildListData("결격 사유가 보이며 반드시 불합격 시켜야 함");
+        Inputcontents5 = new ArrayList<ChildListData>();
+        Inputcontents5.add(childData5);
+        childList = new HashMap<String, ArrayList<ChildListData>>();
+        childList.put(parentList.get(0), Inputcontents);
+        childList.put(parentList.get(1), Inputcontents2);
+        childList.put(parentList.get(2), Inputcontents3);
+        childList.put(parentList.get(3), Inputcontents4);
+        childList.put(parentList.get(4), Inputcontents5);
+        expandableListView = (ExpandableListView) findViewById(R.id.ex_list);
+
+        expandableListviewAdapter = new ExpandableListviewAdapter(this, parentList, childList);
+        expandableListView.setAdapter(expandableListviewAdapter);
 
     }
 
@@ -211,7 +279,7 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
     public void onClick(View v) {
         getEdit = Opnion.getText().toString();
         int id = v.getId();
-        if (id == R.id.eva_1) {
+        if (id == R.id.eval_1) {
             radioButton2.setChecked(false);
             radioButton3.setChecked(false);
             radioButton4.setChecked(false);
@@ -220,7 +288,7 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
             ea = 1;
             Log.d(TAG, String.valueOf(Emp_point));
             Log.d(TAG, String.valueOf(ea));
-        } else if (id == R.id.eva_2) {
+        } else if (id == R.id.eval_2) {
             radioButton1.setChecked(false);
             radioButton3.setChecked(false);
             radioButton4.setChecked(false);
@@ -228,7 +296,7 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
             Emp_point = 4;
             ea = 1;
             Log.d(TAG, String.valueOf(Emp_point));
-        } else if (id == R.id.eva_3) {
+        } else if (id == R.id.eval_3) {
             radioButton1.setChecked(false);
             radioButton2.setChecked(false);
             radioButton4.setChecked(false);
@@ -236,7 +304,7 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
             Emp_point = 3;
             ea = 1;
             Log.d(TAG, String.valueOf(Emp_point));
-        } else if (id == R.id.eva_4) {
+        } else if (id == R.id.eval_4) {
             radioButton1.setChecked(false);
             radioButton2.setChecked(false);
             radioButton3.setChecked(false);
@@ -244,7 +312,7 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
             Emp_point = 2;
             ea = 1;
             Log.d(TAG, String.valueOf(Emp_point));
-        } else if (id == R.id.eva_5) {
+        } else if (id == R.id.eval_5) {
             radioButton1.setChecked(false);
             radioButton2.setChecked(false);
             radioButton3.setChecked(false);
@@ -554,7 +622,6 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
                                         submitdialog.show();
 
 
-
                                     }
                                 } catch (IOException e) {
                                     e.printStackTrace();
@@ -646,7 +713,6 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
                             JSONObject c = new JSONObject(JsonResult);
                             master = c.getJSONObject("master");
                             project_name = c.getString("PROJECT_ID");
-
                             JSONObject ma = new JSONObject(String.valueOf(master));
                             USER_ID = ma.getString("USER_ID");
                             JOB = ma.getString("JOB");
@@ -691,7 +757,7 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
                                 int x = Totalscore.get(n);
                                 Log.d(TAG, String.valueOf(Totalscore));
                                 String id = IDList.get(n);
-                                String con = ConList.get(n);
+                                final String con = ConList.get(n);
                                 if (id.equals("0")) {
                                     eval_title = new TextView(AssessActivity.this);
                                     eval_title.setText(con);
@@ -761,16 +827,17 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
                                     Eval_View.addView(radiobtn);
                                     Group.setTag(n);
                                     Group.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-
                                         @Override
                                         public void onCheckedChanged(RadioGroup group, int checkedId) {
                                             int tag = (int) group.getTag();
                                             switch (checkedId) {
                                                 case R.id.check_five:
                                                     Scorelist.set(tag, 5);
+                                                    Log.d("count", String.valueOf(check_count));
                                                     break;
                                                 case R.id.check_four:
                                                     Scorelist.set(tag, 4);
+                                                    Log.d("count", String.valueOf(check_count));
                                                     break;
                                                 case R.id.check_three:
                                                     Scorelist.set(tag, 3);
@@ -784,6 +851,8 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
                                             }
 
 
+                                            Pr_percent.setText(String.valueOf(check_count));
+
                                             checkcount = 0;
                                             for (int f = 0; f < Scorelist.size(); f++) {
                                                 if (Scorelist.get(f) == 0) {
@@ -792,8 +861,6 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
                                             }
                                             Log.d(TAG, String.valueOf(Scorelist));
                                             Log.d(TAG, String.valueOf(checkcount));
-
-
                                         }
 
 
@@ -858,7 +925,7 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
                             Log.d(TAG, String.valueOf(count));
                             Opnion.setText(TOTAL_COMMENT);
 
-
+//
                             if (TOTAL_EVAL == 5) {
                                 radioButton1.setChecked(true);
                                 ea = 1;

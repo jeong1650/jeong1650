@@ -123,15 +123,17 @@ class PersonInfoAdpater extends BaseAdapter {
         status.setText(infoList.get(position).getSTATUS());
         if(infoList.get(position).getSTATUS().equals("2")){
             status.setText("제출 완료");
-            String strColor = "#FF20D735";
+            String strColor = "#4E67C3";
             status.setTextColor(Color.parseColor(strColor));
-            asses.setText("평가확인");
+            asses.setText("평가 확인");
         } else if(infoList.get(position).getSTATUS().equals("1")){
-            String asscolor = "#FF0E18A1";
+            String asscolor = "#8192D3";
             status.setText("임시 저장");
             status.setTextColor(Color.parseColor(asscolor));
         } else {
+            String waitcolor = "#707070";
             status.setText("평가 대기");
+            status.setTextColor(Color.parseColor(waitcolor));
         }
 
 

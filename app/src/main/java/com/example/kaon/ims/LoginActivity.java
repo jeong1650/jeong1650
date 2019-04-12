@@ -78,7 +78,7 @@ public class LoginActivity extends AppCompatActivity {
 
 
 
-       window.setStatusBarColor(Color.parseColor("#4e67c3"));
+       window.setStatusBarColor(Color.parseColor("#D3D3D3"));
 
 
 
@@ -176,6 +176,7 @@ public class LoginActivity extends AppCompatActivity {
                             Intent LoginIntent = new Intent(LoginActivity.this, MainScreenActivity.class);
                             LoginIntent.putExtra("NAME",NAME);
                             LoginIntent.putExtra("id",idValue);
+                            LoginIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                             startActivity(LoginIntent);
                             failtext.setVisibility(View.GONE);
 

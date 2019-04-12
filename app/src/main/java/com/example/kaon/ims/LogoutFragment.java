@@ -9,6 +9,8 @@ import android.support.annotation.Nullable;
 
 import android.support.v4.app.Fragment;
 
+import android.support.v4.app.FragmentManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,7 +37,10 @@ public class LogoutFragment extends Fragment {
             @Override
             public void negativeclick() {
 
-                logoutDialog.dismiss();
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                fragmentManager.beginTransaction().remove(LogoutFragment.this).commit();
+                fragmentManager.popBackStack();
+
             }
         });
         logoutDialog.show(getActivity().getSupportFragmentManager(),"tag");
