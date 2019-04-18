@@ -58,11 +58,15 @@ public class PersonInfoActivity extends AppCompatActivity implements SwipeRefres
     String username;
     String STATUS;
 
+    int INDEX_ID;
+
+    String idvalue;
+    int indexid;
     ArrayList<String> masterlist;
     String prname;
     String in_name;
     private ProgressDialog pDialog;
-    int INDEX_ID;
+
     ArrayList<String> namelist;
 
     SwipeRefreshLayout mSwipeRefreshLayout;
@@ -109,6 +113,8 @@ public class PersonInfoActivity extends AppCompatActivity implements SwipeRefres
 
         Intent intent = getIntent();
         mName = intent.getStringExtra("NAME");
+        idvalue = intent.getStringExtra("id");
+        indexid = intent.getExtras().getInt("INDEX_ID");
 //        namelist = intent.getStringArrayListExtra("project");
          Log.d(TAG, String.valueOf(namelist));
         mTitle.setText(mName);
@@ -133,8 +139,8 @@ public class PersonInfoActivity extends AppCompatActivity implements SwipeRefres
         apiService = retrofit.create(ApiService.class);
 
         HashMap<String, Object> param = new HashMap<>();
-        param.put("project_name", mName);
-        param.put("userid", username);
+        param.put("PROJECT_INDEX_ID", indexid);
+        param.put("userid", idvalue);
 
 
         apiService.postinfo(param).enqueue(new Callback<ResponseBody>() {
@@ -157,7 +163,7 @@ public class PersonInfoActivity extends AppCompatActivity implements SwipeRefres
                             personinfoitem.setYEAR(c.getString("YEAR"));
                             personinfoitem.setPOSITION(c.getString("POSITION"));
                             personinfoitem.setETC(c.getString("ETC"));
-                            personinfoitem.setPROJECT_ID(c.getString("PROJECT_ID"));
+                            personinfoitem.setPROJECT_ID(c.getInt("PROJECT_ID"));
                             personinfoitem.setSTATUS(c.getString("HISTORY"));
                             personinfoitem.setINDEX_ID(INDEX_ID);
                             personinfoitem.setMASTER_ID(Master_ID);
@@ -249,8 +255,8 @@ public class PersonInfoActivity extends AppCompatActivity implements SwipeRefres
             apiService = retrofit.create(ApiService.class);
 
             HashMap<String, Object> param = new HashMap<>();
-            param.put("project_name", mName);
-            param.put("userid", username);
+            param.put("PROJECT_INDEX_ID", indexid);
+            param.put("userid", idvalue);
 
 
             apiService.postinfo(param).enqueue(new Callback<ResponseBody>() {
@@ -273,7 +279,7 @@ public class PersonInfoActivity extends AppCompatActivity implements SwipeRefres
                                 personinfoitem.setYEAR(c.getString("YEAR"));
                                 personinfoitem.setPOSITION(c.getString("POSITION"));
                                 personinfoitem.setETC(c.getString("ETC"));
-                                personinfoitem.setPROJECT_ID(c.getString("PROJECT_ID"));
+                                personinfoitem.setPROJECT_ID(c.getInt("PROJECT_ID"));
                                 personinfoitem.setSTATUS(c.getString("HISTORY"));
                                 personinfoitem.setINDEX_ID(INDEX_ID);
                                 personinfoitem.setMASTER_ID(Master_ID);

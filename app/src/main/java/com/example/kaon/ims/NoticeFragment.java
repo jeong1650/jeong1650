@@ -51,35 +51,42 @@ public class NoticeFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     ScrollView n_scrollView;
 
+
+
+
+
     private static final String TAG = "NoticeActivity";
 
     public void setId(String id) {
-        this.id = id;
+        this.idvalue = id;
     }
 
     public void setUsername(String username) {
         this.username = username;
     }
 
-    TextView notnotice,title;
+    TextView notnotice, title;
 
-    String id;
+    String idvalue;
     String username;
+
     Context context;
 
     SwipeRefreshLayout mSwipeRefreshLayout;
 
     AddCookiesInterceptor in1;
     OkHttpClient httpClient;
-    public NoticeFragment(){
+
+    public NoticeFragment() {
 
     }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         new loading().execute();
 
-        View view = inflater.inflate(R.layout.person_info,container,false);
+        View view = inflater.inflate(R.layout.person_info, container, false);
         in1 = new AddCookiesInterceptor(getActivity());
         httpClient = new OkHttpClient.Builder().addInterceptor(in1)
                 .build();
@@ -92,18 +99,13 @@ public class NoticeFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
         n_scrollView = view.findViewById(R.id.notice_scroll);
         n_scrollView.requestFocus(View.FOCUS_UP);
-        n_scrollView.scrollTo(0,0);
+        n_scrollView.scrollTo(0, 0);
 
         AddCookiesInterceptor in1 = new AddCookiesInterceptor(getActivity());
 
 
-
         httpClient = new OkHttpClient.Builder()
-
                 .addNetworkInterceptor(in1)
-
-
-
                 .build();
 
         mSwipeRefreshLayout = view.findViewById(R.id.swipe_notice);
@@ -117,7 +119,8 @@ public class NoticeFragment extends Fragment implements SwipeRefreshLayout.OnRef
         apiService = retrofit.create(ApiService.class);
 
         final HashMap<String, String> notice = new HashMap<>();
-        notice.put("Name", id);
+        notice.put("userid", idvalue);
+
 
         apiService.postData(notice).enqueue(new Callback<ResponseBody>() {
             @Override
@@ -136,12 +139,13 @@ public class NoticeFragment extends Fragment implements SwipeRefreshLayout.OnRef
                             listitem.setNAME(c.getString("NAME"));
                             listitem.setSTART_DATE(c.getString("START_DATE"));
                             listitem.setEND_DATE(c.getString("END_DATE"));
+                            listitem.setINDEX_ID(c.getInt("INDEX_ID"));
 //                                listitem.setTYPE(c.getString("TYPE"));
                             NoticeList.add(listitem);
                         }
                         NoticeAdapter adapter = new NoticeAdapter(getActivity(), R.layout.list_gonggo, NoticeList);
                         listView.setAdapter(adapter);
-                    } else{
+                    } else {
                         notnotice.setVisibility(View.VISIBLE);
                         notnotice.setText("등록된 공고가 없습니다.");
                     }
@@ -159,7 +163,6 @@ public class NoticeFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
                 }
             }
-
 
 
             @Override
@@ -182,11 +185,13 @@ public class NoticeFragment extends Fragment implements SwipeRefreshLayout.OnRef
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 //                    String NAME = Gonglist.get(position).get("NAME");
                 String NAME = NoticeList.get(position).getNAME();
-
-                Intent intent = new Intent(getActivity(),PersonInfoActivity.class);
+                int INDEX_ID = NoticeList.get(position).getINDEX_ID();
+                Intent intent = new Intent(getActivity(), PersonInfoActivity.class);
 
                 intent.putExtra("NAME", NAME);
+                intent.putExtra("INDEX_ID",INDEX_ID);
                 intent.putExtra("username", username);
+                intent.putExtra("id",idvalue);
 
                 getActivity().startActivity(intent);
 
@@ -210,7 +215,7 @@ public class NoticeFragment extends Fragment implements SwipeRefreshLayout.OnRef
         apiService = retrofit.create(ApiService.class);
 
         final HashMap<String, String> notice = new HashMap<>();
-        notice.put("Name", id);
+        notice.put("userid", idvalue);
 
         apiService.postData(notice).enqueue(new Callback<ResponseBody>() {
             @Override
@@ -229,12 +234,13 @@ public class NoticeFragment extends Fragment implements SwipeRefreshLayout.OnRef
                             listitem.setNAME(c.getString("NAME"));
                             listitem.setSTART_DATE(c.getString("START_DATE"));
                             listitem.setEND_DATE(c.getString("END_DATE"));
+                            listitem.setINDEX_ID(c.getInt("INDEX_ID"));
 //                                listitem.setTYPE(c.getString("TYPE"));
                             NoticeList.add(listitem);
                         }
                         NoticeAdapter adapter = new NoticeAdapter(getActivity(), R.layout.list_gonggo, NoticeList);
                         listView.setAdapter(adapter);
-                    } else{
+                    } else {
                         notnotice.setVisibility(View.VISIBLE);
                         notnotice.setText("등록된 공고가 없습니다.");
                     }
@@ -252,7 +258,6 @@ public class NoticeFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
                 }
             }
-
 
 
             @Override
@@ -274,6 +279,7 @@ public class NoticeFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     private class loading extends AsyncTask<Void, Void, Void> {
         CustomProgressDialog progressDialog = new CustomProgressDialog(getActivity());
+
         @Override
         protected void onPreExecute() {
             progressDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));

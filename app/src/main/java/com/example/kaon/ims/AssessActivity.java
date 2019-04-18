@@ -2,6 +2,7 @@ package com.example.kaon.ims;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -55,13 +56,13 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
     TextView Pr_percent;
     EditText Opnion;
     String apply_name;
-    int que_count = 0;
+
     String CONTENTS;
 
     String MASTER_ID;
     String PARENT_ID;
     int SCORE;
-
+    int cs = 0;
     Boolean isChecking;
 
     JSONObject master;
@@ -72,6 +73,9 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
     String TOTAL_COMMENT;
     int TOTAL_SCORE;
     String USER_ID;
+    String UserName;
+
+
     String STATUS;
     String INDEX_ID;
     String interviewercheck;
@@ -80,8 +84,7 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
     int check_count;
     int count;
     LinearLayout Eval_View;
-    int[] checkarray;
-    int[] arraycom;
+
 
     //retrofit
     Retrofit retrofit;
@@ -89,7 +92,8 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
 
     ArrayList<String> IDList;
     ArrayList<String> ConList;
-    ArrayList<Integer> ealist;
+    ArrayList<Integer> compare;
+
     LayoutInflater inflater;
 
     //radiobtn
@@ -122,6 +126,8 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
     private ArrayList<String> mChildListContent = null;
     private ExpandableListView mListView;
 
+    String Project_name;
+    ArrayList<String> prnamelist;
 
     //btn
     Button btn_save;
@@ -139,7 +145,7 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
     int q_ea;
     int checkcount;
     //score
-    String project_name;
+    int project_name;
     String userid;
     int Emp_point;
     ArrayList<Integer> Scorelist;
@@ -148,7 +154,9 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
     LinearLayout totalbtn;
     int ea = 0;
 
-    int[] eaArray;
+    int question_ea;
+
+    TextView totalpercent;
 
     private static final String TAG = "AssessActivity";
 
@@ -156,18 +164,16 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
     OkHttpClient httpClient;
 
 
+    ArrayList<String> questionlist;
+
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.assess_appbar);
 
-
-        check_count = 0;
         isCount = true;
-        check_count = 0;
-        checkarray = new int[20];
-        check_count = 1;
+
 
         Window window = getWindow();
 
@@ -189,8 +195,14 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
         IDList = new ArrayList<>();
         ConList = new ArrayList<>();
         Totalscore = new ArrayList<>();
-        eaArray = new int[22];
-
+        questionlist = new ArrayList<>();
+        prnamelist = new ArrayList<>();
+        compare = new ArrayList<>();
+        for (int v = 0; v <= 20; v++) {
+            compare.add(v, 0);
+        }
+        Log.d("comparelist", String.valueOf(compare));
+        totalpercent = (TextView) findViewById(R.id.total_percent);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -231,11 +243,15 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
         btn_tem.setOnClickListener(this);
         fab.setOnClickListener(this);
 
+        SharedPreferences pref = getSharedPreferences("pref", AssessActivity.this.MODE_PRIVATE);
+        check_count = pref.getInt("check_count", 0);
+        Pr_percent.setText("평가 한 문항수 :" + check_count);
 
         new JsonEval().execute();
 
 
     }
+
 
     private void Expandable() {
         parentList = new ArrayList<String>();
@@ -327,6 +343,7 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
 
         } else if (id == R.id.Btn_temporary) {
 
+
             STATUS = "1";
 
             retrofit = new Retrofit.Builder().baseUrl(ApiService.API_URL)
@@ -357,8 +374,8 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
                                 public void checkClick() {
                                     Intent intent = new Intent(AssessActivity.this, PersonInfoActivity.class);
                                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                    intent.putExtra("NAME", project_name);
-                                    intent.putExtra("username", userid);
+                                    intent.putExtra("INDEX_ID", project_name);
+                                    intent.putExtra("id", userid);
                                     AssessActivity.this.startActivity(intent);
                                 }
                             });
@@ -373,8 +390,8 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
                                 public void checkClick() {
                                     Intent intent = new Intent(AssessActivity.this, PersonInfoActivity.class);
                                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                    intent.putExtra("NAME", project_name);
-                                    intent.putExtra("username", userid);
+                                    intent.putExtra("INDEX_ID", project_name);
+                                    intent.putExtra("id", userid);
                                     AssessActivity.this.startActivity(intent);
                                 }
                             });
@@ -406,7 +423,7 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
 
 
         } else if (id == R.id.Btn_save) {
-
+            Pr_percent.setText("평가 완료");
             if (q_ea != count && q_ea != checkcount) {
 
                 final Tablecheck tablecheck = new Tablecheck(AssessActivity.this);
@@ -603,18 +620,18 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
                                     String JsonResult = response.body().string();
                                     if (JsonResult != null) {
                                         JSONObject c = new JSONObject(JsonResult);
+                                        Project_name = c.getString("PROJECT_NAME");
                                         master = c.getJSONObject("master");
                                         JSONObject ma = new JSONObject(String.valueOf(master));
                                         TOTAL_SCORE = ma.getInt("TOTAL_SCORE");
-
                                         final Submitdialog submitdialog = new Submitdialog(AssessActivity.this);
                                         submitdialog.setSubmitdialogListener(new Submitdialog.SubmitdialogListener() {
                                             @Override
                                             public void checkClick() {
                                                 Intent intent = new Intent(AssessActivity.this, PersonInfoActivity.class);
                                                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                                intent.putExtra("NAME", project_name);
-                                                intent.putExtra("username", userid);
+                                                intent.putExtra("INDEX_ID", project_name);
+                                                intent.putExtra("id", userid);
                                                 AssessActivity.this.startActivity(intent);
                                             }
                                         });
@@ -654,8 +671,8 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
                             public void checkClick() {
                                 Intent intent = new Intent(AssessActivity.this, PersonInfoActivity.class);
                                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                intent.putExtra("NAME", project_name);
-                                intent.putExtra("username", userid);
+                                intent.putExtra("INDEX_ID", project_name);
+                                intent.putExtra("id", userid);
                                 AssessActivity.this.startActivity(intent);
                             }
                         });
@@ -712,9 +729,10 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
 
                             JSONObject c = new JSONObject(JsonResult);
                             master = c.getJSONObject("master");
-                            project_name = c.getString("PROJECT_ID");
+                            project_name = c.getInt("PROJECT_ID");
                             JSONObject ma = new JSONObject(String.valueOf(master));
                             USER_ID = ma.getString("USER_ID");
+                            UserName = ma.getString("USER_NAME");
                             JOB = ma.getString("JOB");
                             STATUS = ma.getString("STATUS");
                             userid = ma.getString("USER_ID");
@@ -733,7 +751,7 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
                             applicant = (TextView) findViewById(R.id.applicant);
                             applicant.setText("면접자 : " + apply_name);
                             interviewer = (TextView) findViewById(R.id.interviewer);
-                            interviewer.setText("면접관 : " + USER_ID);
+                            interviewer.setText("면접관 : " + UserName);
 
                             JSONArray jsonArray = c.getJSONArray("detail");
                             for (int i = 0; i < jsonArray.length(); i++) {
@@ -752,7 +770,7 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
                             }
 
                             q_ea = 0;
-
+                            check_count = 0;
                             for (int n = 0; n < IDList.size(); n++) {
                                 int x = Totalscore.get(n);
                                 Log.d(TAG, String.valueOf(Totalscore));
@@ -766,10 +784,16 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
                                     Eval_View.addView(eval_title);
                                     q_ea++;
                                 } else {
+
                                     eval_question = new TextView(AssessActivity.this);
                                     eval_question.setText(con);
+                                    questionlist.add(con);
                                     eval_question.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
                                     Eval_View.addView(eval_question);
+                                    question_ea = questionlist.size();
+                                    cs++;
+                                    totalpercent.setText(String.valueOf(cs));
+//                                    Pr_percent.setText("평가 한 문항수 :" + "0");
 
                                     LinearLayout radiobtn = new LinearLayout(AssessActivity.this);
                                     radiobtn.setOrientation(LinearLayout.HORIZONTAL);
@@ -825,50 +849,70 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
                                     Group.addView(Check1);
 
                                     Eval_View.addView(radiobtn);
-                                    Group.setTag(n);
+                                    Group.setTag(question_ea);
+
+
                                     Group.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
                                         @Override
                                         public void onCheckedChanged(RadioGroup group, int checkedId) {
                                             int tag = (int) group.getTag();
+
                                             switch (checkedId) {
                                                 case R.id.check_five:
                                                     Scorelist.set(tag, 5);
-                                                    Log.d("count", String.valueOf(check_count));
+
                                                     break;
                                                 case R.id.check_four:
                                                     Scorelist.set(tag, 4);
-                                                    Log.d("count", String.valueOf(check_count));
+
                                                     break;
                                                 case R.id.check_three:
                                                     Scorelist.set(tag, 3);
+
                                                     break;
                                                 case R.id.check_two:
                                                     Scorelist.set(tag, 2);
+
                                                     break;
                                                 case R.id.check_one:
                                                     Scorelist.set(tag, 1);
+
                                                     break;
                                             }
 
 
-                                            Pr_percent.setText(String.valueOf(check_count));
+                                            if (isCount == false) {
 
-                                            checkcount = 0;
-                                            for (int f = 0; f < Scorelist.size(); f++) {
-                                                if (Scorelist.get(f) == 0) {
-                                                    checkcount++;
+                                                for (int j = tag; j <= tag; j++) {
+                                                    if (compare.get(tag) != 1) {
+                                                        isCount = true;
+                                                    }
                                                 }
                                             }
-                                            Log.d(TAG, String.valueOf(Scorelist));
-                                            Log.d(TAG, String.valueOf(checkcount));
-                                        }
 
+                                            if (isCount == true) {
+                                                check_count++;
+                                            }
+                                            for (int i = tag; i <= tag; i++) {
+                                                if (Scorelist.get(i) != 0) {
+                                                    compare.set(tag, 1);
+                                                    isCount = false;
+                                                } else {
+
+                                                    break;
+                                                }
+
+                                            }
+
+                                            Pr_percent.setText("평가 한 문항수 :" + check_count);
+
+
+                                        }
 
                                     });
 
 
                                 }
-
                                 if (STATUS.equals("2")) {
                                     totalbtn.removeAllViews();
                                     LinearLayout check = new LinearLayout(AssessActivity.this);
@@ -916,16 +960,14 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
                             }
 
                             Log.d(TAG, String.valueOf(Scorelist));
-                            count = 0;
-                            for (int f = 0; f < Scorelist.size(); f++) {
-                                if (Scorelist.get(f) == 0) {
-                                    count++;
-                                }
-                            }
-                            Log.d(TAG, String.valueOf(count));
+
                             Opnion.setText(TOTAL_COMMENT);
 
-//
+
+                            Log.d(TAG, String.valueOf(Scorelist));
+                            Log.d(TAG, String.valueOf(check_count));
+
+
                             if (TOTAL_EVAL == 5) {
                                 radioButton1.setChecked(true);
                                 ea = 1;
@@ -986,12 +1028,20 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
 
+//
+
         }
 
     }
 
+
     @Override
     protected void onStop() {
+        SharedPreferences pref = getSharedPreferences("pref", AssessActivity.this.MODE_PRIVATE);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putInt("check_count", check_count);
+
+        editor.commit();
         super.onStop();
 
 

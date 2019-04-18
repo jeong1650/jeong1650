@@ -28,9 +28,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -70,8 +72,8 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
 
     Boolean Todaycheck = true;
 
-    String project;
-    ArrayList<String> projectlist;
+    int project;
+    ArrayList<Integer> projectlist;
     String et;
     ArrayList<String> namelist;
     ArrayList<String> polist;
@@ -91,10 +93,20 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
     String cutstarttime;
     String cutendtime;
     ArrayList<String> placelist;
+    ArrayList<String> prnamelist;
     String selectedDateStr;
     SwipeRefreshLayout mSwipeRefreshLayout;
     String p_place;
     String Todaydate;
+
+    String project_name;
+    String plusdate;
+    String minusdate;
+    String arraymdate;
+    int INDEX_ID;
+
+    Calendar cal;
+    ArrayList<String> minusdatelist;
 
     Boolean isExistdata = false;
 
@@ -117,6 +129,7 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         new loading().execute();
+        minusdatelist = new ArrayList<>();
         height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1, getResources().getDisplayMetrics());
         final View view = inflater.inflate(R.layout.interview_schedule,container,false);
 
@@ -136,8 +149,8 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
 //        idvalue = intent.getStringExtra("id");
 //        re_view = (LinearLayout) view.findViewById(R.id.re_view);
 
-
 //        listView = (ListView) findViewById(R.id.listview_schedule);
+
         start_time = (TextView) view.findViewById(R.id.in_time);
         finish_time = (TextView) view.findViewById(R.id.end_time);
         interview_place = (TextView) view.findViewById(R.id.inter_place);
@@ -159,25 +172,92 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
         compar_starttime = new ArrayList<>();
         e_timelist = new ArrayList<>();
         compar_endtime = new ArrayList<>();
+        prnamelist = new ArrayList<>();
 
-
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         /* start 2 months ago from now */
-        Calendar startDate = Calendar.getInstance();
+        final Calendar startDate = Calendar.getInstance();
         startDate.add(Calendar.MONTH, -2);
 
+
+
         /* end after 2 months from now */
-         Calendar endDate = Calendar.getInstance();
+         final Calendar endDate = Calendar.getInstance();
         endDate.add(Calendar.MONTH, 2);
 
         // Default Date set to Today.
-         Calendar defaultSelectedDate = Calendar.getInstance();
+         final Calendar defaultSelectedDate = Calendar.getInstance();
          Log.d(TAG, String.valueOf(defaultSelectedDate));
 
+        for(int c= 1; c<=7; c++) {
+            cal  = Calendar.getInstance();
+            cal.add(Calendar.DAY_OF_MONTH, -c);
+            arraymdate = format.format(cal.getTime());
+            minusdatelist.add(arraymdate);
+        }
+          for(int b=0; b<minusdatelist.size();b++){
+              minusdate = minusdatelist.get(b);
 
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+              retrofit = new Retrofit.Builder().baseUrl(ApiService.API_URL)
+                      .client(httpClient)
+                      .build();
+              apiService = retrofit.create(ApiService.class);
+
+              final HashMap<String, String> Schedule = new HashMap<>();
+              Schedule.put("USER_ID", idvalue);
+              Schedule.put("INT_DATE", minusdate);
+
+              final int finalB = b;
+
+              apiService.Schedule(Schedule).enqueue(new Callback<ResponseBody>() {
+                  @Override
+                  public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+
+                      try {
+                          String result = response.body().string();
+
+                          if (!result.equals("[]")) {
+                              isExistdata = true;
+
+
+                          } else  {
+                              isExistdata = false;
+                          }
+
+                      if(isExistdata = true){
+
+                      }
+
+                      } catch (IOException e) {
+                          e.printStackTrace();
+                      }
+                      catch (NullPointerException e) {
+                          e.printStackTrace();
+                          Toast.makeText(getActivity(), "데이터가 없습니다", Toast.LENGTH_SHORT).show();
+                      }
+
+                  }
+
+                  @Override
+                  public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                      final ErrorDialog errorDialog = new ErrorDialog(getActivity());
+                      errorDialog.setErrorDialogListener(new ErrorDialog.ErrorDialogListener() {
+                          @Override
+                          public void checkClick() {
+                              errorDialog.cancel();
+
+                          }
+                      });
+                      errorDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                      errorDialog.show();
+                  }
+              });
+          }
 
 
         Todaydate = format.format(System.currentTimeMillis());
+
         horizontalCalendar = builder
                 .range(startDate, endDate)
                 .datesNumberOnScreen(5)
@@ -197,13 +277,9 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
 //                    public List<CalendarEvent> events(Calendar date) {
 //                        final List<CalendarEvent> events = new ArrayList<>();
 //
-//                        events.add(new CalendarEvent(Color.YELLOW, "event"));
-//
-//
-//
-//
-////                        }
-//
+//                        if (isExistdata == true){
+//                        horizontalCalendar.hide();
+//                        }
 //
 //                        return events;
 //                    }
@@ -221,7 +297,7 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
         apiService = retrofit.create(ApiService.class);
 
         final HashMap<String, String> Schedule = new HashMap<>();
-        Schedule.put("USER_ID", username);
+        Schedule.put("USER_ID", idvalue);
         Schedule.put("INT_DATE", Todaydate);
 
         apiService.Schedule(Schedule).enqueue(new Callback<ResponseBody>() {
@@ -250,6 +326,7 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
                             cutendtime = endtime.substring(0, 5);
                             s_place = c.getString("PLACE");
                             int_date = c.getString("INT_DATE");
+
 
                             compar_starttime.add(cutstarttime);
                             compar_endtime.add(cutendtime);
@@ -354,9 +431,12 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
                             name_sch = comp.getString("NAME");
                             pot_sch = comp.getString("POSITION");
                             strt = comp.getString("START_TIME");
-                            project = comp.getString("PROJECT_NAME");
+                            INDEX_ID = comp.getInt("INDEX_ID");
+                            project = comp.getInt("PROJECT_INDEX_ID");
+                            project_name = comp.getString("PROJECT_NAME");
                             String cutstr = strt.substring(0, 5);
                             projectlist.add(project);
+                            prnamelist.add(project_name);
                             if (st.equals(cutstr)) {
                                 s_name = new TextView(getActivity());
                                 s_name.setId(z);
@@ -367,8 +447,9 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
                                     @Override
                                     public void onClick(View v) {
                                         Intent schduleinfo = new Intent(getActivity(),PersonInfoActivity.class);
-                                        schduleinfo.putExtra("username", username);
-                                        schduleinfo.putExtra("NAME", projectlist.get(finalZ));
+                                        schduleinfo.putExtra("id", idvalue);
+                                        schduleinfo.putExtra("INDEX_ID", projectlist.get(finalZ));
+                                        schduleinfo.putExtra("NAME",namelist.get(finalZ));
                                         getActivity().startActivity(schduleinfo);
 
                                     }
@@ -431,7 +512,7 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
                 apiService = retrofit.create(ApiService.class);
 
                 final HashMap<String, String> Schedule = new HashMap<>();
-                Schedule.put("USER_ID", username);
+                Schedule.put("USER_ID", idvalue);
                 Schedule.put("INT_DATE", selectedDateStr);
 
                 apiService.Schedule(Schedule).enqueue(new Callback<ResponseBody>() {
@@ -559,9 +640,11 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
                                     name_sch = comp.getString("NAME");
                                     pot_sch = comp.getString("POSITION");
                                     strt = comp.getString("START_TIME");
-                                    project = comp.getString("PROJECT_NAME");
+                                    project = comp.getInt("PROJECT_INDEX_ID");
+                                    project_name = comp.getString("PROJECT_NAME");
                                     String cutstr = strt.substring(0, 5);
                                     projectlist.add(project);
+                                    prnamelist.add(project_name);
                                     if (st.equals(cutstr)) {
                                         s_name = new TextView(getActivity());
                                         s_name.setId(z);
@@ -571,8 +654,9 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
                                             @Override
                                             public void onClick(View v) {
                                                 Intent schduleinfo = new Intent(getActivity(), PersonInfoActivity.class);
-                                                schduleinfo.putExtra("username", username);
-                                                schduleinfo.putExtra("NAME", projectlist.get(finalZ));
+                                                schduleinfo.putExtra("id", idvalue);
+                                                schduleinfo.putExtra("INDEX_ID", projectlist.get(finalZ));
+                                                schduleinfo.putExtra("NAME",prnamelist.get(finalZ));
                                                 getActivity().startActivity(schduleinfo);
 
                                             }
@@ -645,7 +729,7 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
         apiService = retrofit.create(ApiService.class);
 
         final HashMap<String, String> Schedule = new HashMap<>();
-        Schedule.put("USER_ID", username);
+        Schedule.put("USER_ID", idvalue);
         Schedule.put("INT_DATE", refreshdate);
 
         apiService.Schedule(Schedule).enqueue(new Callback<ResponseBody>() {
@@ -775,9 +859,11 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
                             name_sch = comp.getString("NAME");
                             pot_sch = comp.getString("POSITION");
                             strt = comp.getString("START_TIME");
-                            project = comp.getString("PROJECT_NAME");
+                            project = comp.getInt("PROJECT_INDEX_ID");
+                            project_name = comp.getString("PROJECT_NAME");
                             String cutstr = strt.substring(0, 5);
                             projectlist.add(project);
+                            prnamelist.add(project_name);
                             if (st.equals(cutstr)) {
                                 s_name = new TextView(getActivity());
                                 s_name.setId(z);
@@ -787,8 +873,10 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
                                     @Override
                                     public void onClick(View v) {
                                         Intent schduleinfo = new Intent(getActivity(), PersonInfoActivity.class);
-                                        schduleinfo.putExtra("username", username);
-                                        schduleinfo.putExtra("NAME", projectlist.get(finalZ));
+                                        schduleinfo.putExtra("id", idvalue);
+                                        schduleinfo.putExtra("INDEX_ID", projectlist.get(finalZ));
+                                        schduleinfo.putExtra("NAME", prnamelist.get(finalZ));
+
                                         getActivity().startActivity(schduleinfo);
 
                                     }

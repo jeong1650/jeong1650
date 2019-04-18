@@ -43,6 +43,7 @@
                     app:sizeMiddleText="20sp"
                     android:background="@color/buttoncolor"
                     app:textColorSelected="#FFFF"
+
                     />
 
             </android.support.design.widget.AppBarLayout>

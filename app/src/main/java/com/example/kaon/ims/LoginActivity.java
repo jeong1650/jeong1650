@@ -189,27 +189,28 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
-                    } catch (NullPointerException e){
-                        e.printStackTrace();
-                        AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
-
-                        builder.setTitle("확인")
-                                .setMessage("아이디와 비밀번호를 입력하세요")
-                                .setCancelable(false)
-                                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.cancel();
-
-                                    }
-                                });
-
-
-                        AlertDialog dialog = builder.create();
-                        //다이어로그 생성
-                        dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND); //dim처리
-                        dialog.show();
                     }
+//                    catch (NullPointerException e){
+//                        e.printStackTrace();
+//                        AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+//
+//                        builder.setTitle("확인")
+//                                .setMessage("아이디와 비밀번호를 입력하세요")
+//                                .setCancelable(false)
+//                                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+//                                    @Override
+//                                    public void onClick(DialogInterface dialog, int which) {
+//                                        dialog.cancel();
+//
+//                                    }
+//                                });
+//
+//
+//                        AlertDialog dialog = builder.create();
+//                        //다이어로그 생성
+//                        dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND); //dim처리
+//                        dialog.show();
+//                    }
                     catch (JSONException e) {
                         e.printStackTrace();
                     }

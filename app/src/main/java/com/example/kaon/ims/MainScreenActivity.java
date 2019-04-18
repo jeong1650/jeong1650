@@ -114,6 +114,7 @@ public class MainScreenActivity extends AppCompatActivity {
                 case 1:
                     WaitpersonFragment waitpersonFragment = new WaitpersonFragment();
                     waitpersonFragment.setUsername(mName);
+                    waitpersonFragment.setId(idValue);
                     return waitpersonFragment;
 
                 case 2:

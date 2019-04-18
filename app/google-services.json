@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "219445951788",
+    "firebase_url": "https://imsfcm-addcf.firebaseio.com",
+    "project_id": "imsfcm-addcf",
+    "storage_bucket": "imsfcm-addcf.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:219445951788:android:35b3d513194c4174",
+        "android_client_info": {
+          "package_name": "com.example.kaon.ims"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "219445951788-o50d49op4f5i3da591uuqgl8fvq7ri5e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-6ICq4zy9nlwW0E74_RGCSoDeXPUjzuA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "219445951788-o50d49op4f5i3da591uuqgl8fvq7ri5e.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

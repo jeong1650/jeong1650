@@ -5,7 +5,7 @@ public class Personinfoitem {
     private String YEAR;
     private String POSITION;
     private String ETC;
-    private String PROJECT_ID;
+    private int PROJECT_ID;
     private int INDEX_ID;
     private String resumepath;
     private String portpath;
@@ -60,11 +60,11 @@ public class Personinfoitem {
         this.ETC = ETC;
     }
 
-    public String getPROJECT_ID() {
+    public int getPROJECT_ID() {
         return PROJECT_ID;
     }
 
-    public void setPROJECT_ID(String PROJECT_ID) {
+    public void setPROJECT_ID(int PROJECT_ID) {
         this.PROJECT_ID = PROJECT_ID;
     }
 

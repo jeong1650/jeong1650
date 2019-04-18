@@ -39,6 +39,11 @@ import retrofit2.Retrofit;
 
 public class WaitpersonFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     String username;
+    String id;
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     //View
     TextView mTitle;
@@ -92,6 +97,7 @@ public class WaitpersonFragment extends Fragment implements SwipeRefreshLayout.O
 
         mTitle = (TextView) view.findViewById(R.id.w_title);
         mPerson = (ListView) view.findViewById(R.id.w_list);
+        mPerson.setFocusable(false);
 
         mTitle.setText("서류대기자");
 
@@ -108,7 +114,7 @@ public class WaitpersonFragment extends Fragment implements SwipeRefreshLayout.O
         apiService = retrofit.create(ApiService.class);
 
         HashMap<String, String> wait = new HashMap<>();
-        wait.put("USER_ID", username);
+        wait.put("USER_ID", id);
 
 
         apiService.waitlist(wait).enqueue(new Callback<ResponseBody>() {
@@ -199,7 +205,7 @@ public class WaitpersonFragment extends Fragment implements SwipeRefreshLayout.O
         apiService = retrofit.create(ApiService.class);
 
         HashMap<String, String> wait = new HashMap<>();
-        wait.put("USER_ID", username);
+        wait.put("USER_ID", id);
 
 
         apiService.waitlist(wait).enqueue(new Callback<ResponseBody>() {

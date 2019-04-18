@@ -5,6 +5,15 @@ public class Listitem {
      private String START_DATE;
      private String END_DATE;
      private String TYPE;
+     private int INDEX_ID;
+
+    public int getINDEX_ID() {
+        return INDEX_ID;
+    }
+
+    public void setINDEX_ID(int INDEX_ID) {
+        this.INDEX_ID = INDEX_ID;
+    }
 
     public String getNAME() {
         return NAME;
