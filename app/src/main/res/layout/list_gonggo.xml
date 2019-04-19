@@ -12,6 +12,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
             android:textSize="25dp"
+            android:text="공고"
             android:id="@+id/gongo"/>
         <LinearLayout
             android:layout_width="wrap_content"
@@ -21,17 +22,30 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/s_date"/>
+                android:id="@+id/s_date"
+                android:text="시작"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/f_date"/>
+                android:id="@+id/f_date"
+                android:text="끝"/>
         </LinearLayout>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/type"
-            android:layout_marginLeft="20dp"/>
+            android:id="@+id/eval_wait"
+            android:layout_marginLeft="20dp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/eval_temp"
+            android:layout_marginLeft="5dp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/eval_ok"
+            android:layout_marginLeft="5dp" />
+
     </LinearLayout>
 
 </RelativeLayout>

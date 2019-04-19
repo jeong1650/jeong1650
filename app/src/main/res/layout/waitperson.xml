@@ -39,7 +39,9 @@
         <ListView
             android:layout_width="match_parent"
             android:layout_height="700dp"
-            android:id="@+id/w_list">
+            android:id="@+id/w_list"
+            android:dividerHeight="0dp"
+            android:divider="@null">
 
         </ListView>
         </LinearLayout>

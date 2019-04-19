@@ -5,8 +5,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,7 +36,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
-class PersonInfoAdpater extends BaseAdapter {
+class PersonInfoAdpater extends BaseAdapter{
     Context applicationContext;
     int person_list;
     List<Personinfoitem> infoList;
@@ -50,7 +53,9 @@ class PersonInfoAdpater extends BaseAdapter {
     ApiService apiService;
     ArrayList<Integer> IndexList;
     Context mContext;
-    TextView name, year, T_position, etc,status;
+
+
+
     int b;
 
     public PersonInfoAdpater(Context applicationContext, int person_list, List<Personinfoitem> infoList) {
@@ -70,10 +75,13 @@ class PersonInfoAdpater extends BaseAdapter {
         return infoList.get(position);
     }
 
+
     @Override
     public long getItemId(int position) {
         return position;
     }
+
+
 
     public List<Personinfoitem> getInfoList() {
         return infoList;
@@ -101,22 +109,31 @@ class PersonInfoAdpater extends BaseAdapter {
                 .build();
         INDEX_ID = infoList.get(position).getINDEX_ID();
 
+        TextView name, year, T_position, etc,status, path;
 
+        View statusview;
 
+//        statusview = v.findViewById(R.id.as_status);
         Button asses;
-        name = (TextView) v.findViewById(R.id.name);
+        name= v.findViewById(R.id.name);
         name.setText(infoList.get(position).getNAME());
+
         year = (TextView) v.findViewById(R.id.career);
         if(infoList.get(position).getYEAR().equals("0")){
             year.setText("신입");
         }else{
-            year.setText(infoList.get(position).getYEAR()+"년");
+            year.setText("경력"+infoList.get(position).getYEAR()+"년");
+        }
+        path = (TextView) v.findViewById(R.id.path);
+        if (infoList.get(position).getPath().equals("0")) {
+            path.setText("지원자");
+        }else {
+            path.setText("서칭인원");
         }
         etc = v.findViewById(R.id.etc);
-        etc.setText(infoList.get(position).getETC());
+        etc.setText("참고 : "+""+infoList.get(position).getETC());
         T_position = (TextView) v.findViewById(R.id.position);
         T_position.setText(infoList.get(position).getPOSITION());
-
 
         status = (TextView) v.findViewById(R.id.status);
         asses = (Button) v.findViewById(R.id.assess);
@@ -125,15 +142,18 @@ class PersonInfoAdpater extends BaseAdapter {
             status.setText("제출 완료");
             String strColor = "#4E67C3";
             status.setTextColor(Color.parseColor(strColor));
+//            statusview.setBackgroundResource(R.drawable.mybtn);
             asses.setText("평가 확인");
         } else if(infoList.get(position).getSTATUS().equals("1")){
             String asscolor = "#8192D3";
             status.setText("임시 저장");
+//            statusview.setBackgroundResource(R.drawable.selectstyle);
             status.setTextColor(Color.parseColor(asscolor));
         } else {
             String waitcolor = "#707070";
             status.setText("평가 대기");
             status.setTextColor(Color.parseColor(waitcolor));
+//            statusview.setBackgroundResource(R.drawable.rounded_edittext);
         }
 
 

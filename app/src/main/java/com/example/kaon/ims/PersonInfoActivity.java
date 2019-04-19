@@ -12,6 +12,8 @@ import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
+import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.util.Log;
 import android.view.Window;
@@ -39,7 +41,7 @@ import retrofit2.Retrofit;
 public class PersonInfoActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
     //View
     TextView mTitle;
-    ListView mPerson;
+//    RecyclerView mPerson;
     AddCookiesInterceptor in1;
     OkHttpClient httpClient;
     Personinfoitem personinfoitem;
@@ -48,11 +50,14 @@ public class PersonInfoActivity extends AppCompatActivity implements SwipeRefres
     String mName;
     String etc_form;
     PersonInfoAdpater adpater;
+    ListView mPerson;
+//    RvAdapter adpater;
     //Retrofit
     Retrofit retrofit;
     ApiService apiService;
 
     String Master_ID;
+    String path;
     //List
     List<Personinfoitem> infoList;
     String username;
@@ -89,17 +94,8 @@ public class PersonInfoActivity extends AppCompatActivity implements SwipeRefres
         setContentView(R.layout.interview_person);
 
         Window window = getWindow();
-
-
-
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-
-
-
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-
-
-
         window.setStatusBarColor(Color.parseColor("#4e67c3"));
 
         in1 = new AddCookiesInterceptor(this);
@@ -107,6 +103,7 @@ public class PersonInfoActivity extends AppCompatActivity implements SwipeRefres
                 .build();
         mTitle = (TextView) findViewById(R.id.P_title);
         mPerson = (ListView) findViewById(R.id.i_list);
+//        mPerson = (RecyclerView) findViewById(R.id.main_rv);
         mPerson.setFocusable(false);
         masterlist = new ArrayList<>();
 //        Peronlist = new ArrayList<>();
@@ -165,6 +162,7 @@ public class PersonInfoActivity extends AppCompatActivity implements SwipeRefres
                             personinfoitem.setETC(c.getString("ETC"));
                             personinfoitem.setPROJECT_ID(c.getInt("PROJECT_ID"));
                             personinfoitem.setSTATUS(c.getString("HISTORY"));
+                            personinfoitem.setPath(c.getString("PATH"));
                             personinfoitem.setINDEX_ID(INDEX_ID);
                             personinfoitem.setMASTER_ID(Master_ID);
 
@@ -281,6 +279,7 @@ public class PersonInfoActivity extends AppCompatActivity implements SwipeRefres
                                 personinfoitem.setETC(c.getString("ETC"));
                                 personinfoitem.setPROJECT_ID(c.getInt("PROJECT_ID"));
                                 personinfoitem.setSTATUS(c.getString("HISTORY"));
+                                personinfoitem.setPath(c.getString("PATH"));
                                 personinfoitem.setINDEX_ID(INDEX_ID);
                                 personinfoitem.setMASTER_ID(Master_ID);
 

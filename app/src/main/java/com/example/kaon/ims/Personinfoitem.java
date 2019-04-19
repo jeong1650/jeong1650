@@ -11,6 +11,15 @@ public class Personinfoitem {
     private String portpath;
     private String MASTER_ID;
     private String STATUS;
+    private String path;
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
 
     public String getSTATUS() {
         return STATUS;
