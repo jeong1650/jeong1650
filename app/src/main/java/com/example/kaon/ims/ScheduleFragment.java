@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.util.TypedValue;
@@ -37,6 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import devs.mulham.horizontalcalendar.HorizontalCalendar;
+import devs.mulham.horizontalcalendar.HorizontalCalendarView;
 import devs.mulham.horizontalcalendar.model.CalendarEvent;
 import devs.mulham.horizontalcalendar.utils.CalendarEventsPredicate;
 import devs.mulham.horizontalcalendar.utils.HorizontalCalendarListener;
@@ -116,6 +118,7 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
 
     HorizontalCalendar.Builder builder = null;
     int height;
+    int width;
     public ScheduleFragment(){
 
     }
@@ -133,8 +136,10 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         new loading().execute();
+
         minusdatelist = new ArrayList<>();
         height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1, getResources().getDisplayMetrics());
+
         final View view = inflater.inflate(R.layout.interview_schedule,container,false);
 
         in1 = new AddCookiesInterceptor(getActivity());
@@ -186,8 +191,6 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
         final Calendar startDate = Calendar.getInstance();
         startDate.add(Calendar.MONTH, -2);
 
-
-
         /* end after 2 months from now */
          final Calendar endDate = Calendar.getInstance();
         endDate.add(Calendar.MONTH, 2);
@@ -201,6 +204,7 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
             cal.add(Calendar.DAY_OF_MONTH, -c);
             arraymdate = format.format(cal.getTime());
             minusdatelist.add(arraymdate);
+
         }
 //          for(int b=0; b<minusdatelist.size();b++){
 //              minusdate = minusdatelist.get(b);
@@ -306,6 +310,9 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
                                         String result = response.body().string();
 
                                         if (!result.equals("[]")) {
+                                            HorizontalCalendarView hv = new HorizontalCalendarView(getActivity());
+                                            hv.getAdapter();
+
 
                                         } else  {
 

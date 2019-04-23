@@ -6,6 +6,8 @@
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
     android:orientation="vertical"
+    android:background="#fbfbfb"
+    android:id="@+id/totalfrag"
     >
     <RelativeLayout
         android:layout_width="match_parent"

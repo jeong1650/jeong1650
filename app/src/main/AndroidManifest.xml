@@ -57,6 +57,7 @@
         <activity android:name=".PreviousActivity.WaitPersonActivity"></activity>
         <activity android:name=".PersonInfoActivity"></activity>
         <activity android:name=".AssessActivity"></activity>
+        <activity android:name=".SettingActivity"></activity>
     </application>
 
 </manifest>

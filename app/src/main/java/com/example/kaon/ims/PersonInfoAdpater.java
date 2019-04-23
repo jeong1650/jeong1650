@@ -55,9 +55,6 @@ class PersonInfoAdpater extends BaseAdapter{
     Context mContext;
 
 
-
-    int b;
-
     public PersonInfoAdpater(Context applicationContext, int person_list, List<Personinfoitem> infoList) {
         this.applicationContext = applicationContext;
         this.person_list = person_list;

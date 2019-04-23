@@ -37,9 +37,12 @@ public class LogoutFragment extends Fragment {
             @Override
             public void negativeclick() {
 
+
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                 fragmentManager.beginTransaction().remove(LogoutFragment.this).commit();
                 fragmentManager.popBackStack();
+
+
 
             }
         });

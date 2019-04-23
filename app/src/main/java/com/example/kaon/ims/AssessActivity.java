@@ -7,14 +7,19 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -175,8 +180,6 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
 
         isCount = true;
 
-
-
         Window window = getWindow();
 
 
@@ -200,9 +203,7 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
         questionlist = new ArrayList<>();
 
         compare = new ArrayList<>();
-        for (int v = 0; v <= 22; v++) {
-            compare.add(v, 0);
-        }
+
         Log.d("comparelist", String.valueOf(compare));
         totalpercent = (TextView) findViewById(R.id.total_percent);
 
@@ -245,9 +246,15 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
         btn_tem.setOnClickListener(this);
         fab.setOnClickListener(this);
 
-        SharedPreferences pref = getSharedPreferences("pref", AssessActivity.this.MODE_PRIVATE);
-        ref_count = pref.getInt("check_count", 0);
-        Pr_percent.setText("평가 한 문항수 :" + ref_count);
+
+
+        for (int v = 0; v <= 22; v++) {
+
+            compare.add(v, 0);
+
+
+        }
+        
 
         new JsonEval().execute();
 
@@ -262,6 +269,7 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
         parentList.add("채용 가능");
         parentList.add("채용 유보");
         parentList.add("채용 불가");
+
         ChildListData childData = new ChildListData("꼭 함께 일하고 싶으며, 개인과 회사의 시너지 효과가 극대화 될 것임");
         Inputcontents = new ArrayList<ChildListData>();
         Inputcontents.add(childData);
@@ -344,9 +352,13 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
             finish();
 
         } else if (id == R.id.Btn_temporary) {
-
-
             STATUS = "1";
+
+            SharedPreferences pref = getSharedPreferences("pref", AssessActivity.this.MODE_PRIVATE);
+            SharedPreferences.Editor editor = pref.edit();
+            editor.putInt("check_count", check_count);
+
+            editor.commit();
 
             retrofit = new Retrofit.Builder().baseUrl(ApiService.API_URL)
                     .client(httpClient)
@@ -759,6 +771,16 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
                             applicant.setText("면접자 : " + apply_name);
                             interviewer = (TextView) findViewById(R.id.interviewer);
                             interviewer.setText("면접관 : " + UserName);
+                            SharedPreferences pref = getSharedPreferences("pref", AssessActivity.this.MODE_PRIVATE);
+                            if(STATUS.equals("1")){
+                                ref_count = pref.getInt("check_count", 0);
+                                Pr_percent.setText("평가 한 문항수 :" + ref_count+"/20");
+                            } else{
+                                int startcount = 0;
+                                Pr_percent.setText("평가 한 문항수 :" + startcount+"/20");
+                            }
+
+
 
                             JSONArray jsonArray = c.getJSONArray("detail");
                             for (int i = 0; i < jsonArray.length(); i++) {
@@ -783,6 +805,7 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
                             q_ea = 0;
                             Log.e("STATUS",STATUS);
                             if(STATUS.equals("1")){
+                                isCount = false;
                                 check_count = ref_count;
                             } else if(STATUS.equals("2")) {
                                 check_count = ref_count;
@@ -853,6 +876,7 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
                                         Check1.setChecked(true);
                                     }
 
+
                                     Log.d(TAG, String.valueOf(n));
                                     LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                                             LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -878,25 +902,22 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
                                             switch (checkedId) {
                                                 case R.id.check_five:
                                                     Scorelist.set(tag, 5);
-
                                                     break;
                                                 case R.id.check_four:
                                                     Scorelist.set(tag, 4);
-
                                                     break;
                                                 case R.id.check_three:
                                                     Scorelist.set(tag, 3);
-
                                                     break;
                                                 case R.id.check_two:
                                                     Scorelist.set(tag, 2);
-
                                                     break;
                                                 case R.id.check_one:
                                                     Scorelist.set(tag, 1);
-
                                                     break;
                                             }
+
+
 
 
                                             if (isCount == false) {
@@ -911,6 +932,7 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
                                             if (isCount == true) {
                                                 check_count++;
                                             }
+
                                             for (int i = tag; i <= tag; i++) {
                                                 if (Scorelist.get(i) != 0) {
                                                     compare.set(tag, 1);
@@ -1069,11 +1091,7 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
 
     @Override
     protected void onStop() {
-        SharedPreferences pref = getSharedPreferences("pref", AssessActivity.this.MODE_PRIVATE);
-        SharedPreferences.Editor editor = pref.edit();
-        editor.putInt("check_count", check_count);
 
-        editor.commit();
         super.onStop();
 
 

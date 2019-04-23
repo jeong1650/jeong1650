@@ -7,15 +7,21 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ListView;
@@ -38,7 +44,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
-public class PersonInfoActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
+public class PersonInfoActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, NavigationView.OnNavigationItemSelectedListener {
     //View
     TextView mTitle;
 //    RecyclerView mPerson;
@@ -91,7 +97,7 @@ public class PersonInfoActivity extends AppCompatActivity implements SwipeRefres
     protected void onCreate(@Nullable Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.interview_person);
+        setContentView(R.layout.personactvity_nav_bar);
 
         Window window = getWindow();
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
@@ -122,6 +128,18 @@ public class PersonInfoActivity extends AppCompatActivity implements SwipeRefres
 //        in_name = intent.getStringExtra("username");
         mSwipeRefreshLayout = findViewById(R.id.swipe_person);
         mSwipeRefreshLayout.setOnRefreshListener(this);
+
+        Toolbar toolbarassess = (Toolbar) findViewById(R.id.toolbar_pinfo);
+        setSupportActionBar(toolbarassess);
+        getSupportActionBar().setTitle("");
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.pinfo_drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbarassess, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.pinfo_nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
         new InfoData().execute();
 
 
@@ -219,6 +237,19 @@ public class PersonInfoActivity extends AppCompatActivity implements SwipeRefres
         });
         mSwipeRefreshLayout.setRefreshing(false);
 
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+        int id = menuItem.getItemId();
+
+        if(id == R.id.nav_home){
+            Intent homeintent = new Intent(PersonInfoActivity.this,MainScreenActivity.class);
+            homeintent.putExtra("NAME",username);
+            homeintent.putExtra("id",idvalue);
+            startActivity(homeintent);
+        }
+        return false;
     }
 
     private class InfoData extends AsyncTask<Void, Void, Void> {

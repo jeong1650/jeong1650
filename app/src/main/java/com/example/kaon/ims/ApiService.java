@@ -60,4 +60,7 @@ public interface ApiService {
     @POST("mobile/resumelist")
     Call<ResponseBody>waitlist(@FieldMap HashMap<String ,String> wait);
 
+    @FormUrlEncoded
+    @POST("push/insertInfo")
+    Call<ResponseBody>requestpush(@FieldMap HashMap<String ,String> push);
 }

@@ -64,7 +64,7 @@ public class LoginActivity extends AppCompatActivity {
     TextView failtext;
 
     LinearLayout Loginfail;
-
+    String token = null;
     SharedPreferences sharedPreferences;
     private static final String TAG = "LoginActivity";
 
@@ -72,6 +72,8 @@ public class LoginActivity extends AppCompatActivity {
     AddCookiesInterceptor in1;
     ReceivedCookiesInterceptor in2;
     OkHttpClient httpClient;
+    String OS;
+    String deviceID;
 
     private Boolean isPermission = true;
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -80,6 +82,10 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
 
+        token =  FirebaseInstanceId.getInstance().getToken();
+        Log.e(TAG,token);
+        OS = "Android";
+        deviceID = android.provider.Settings.Secure.getString(getBaseContext().getContentResolver(), Settings.Secure.ANDROID_ID);
 
 //        String OS = "Android";
 //        Log.e("OS 명 :", OS);
@@ -116,6 +122,7 @@ public class LoginActivity extends AppCompatActivity {
         failtext = findViewById(R.id.failpw);
 
         //in1 = new AddCookiesInterceptor(this);
+        in1 = new AddCookiesInterceptor(this);
         in2 = new ReceivedCookiesInterceptor(this);
 
         httpClient = new OkHttpClient.Builder()
@@ -149,20 +156,20 @@ public class LoginActivity extends AppCompatActivity {
 
             }
         });
-        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
-            @Override
-            public void onComplete(@NonNull Task<InstanceIdResult> task) {
-                if (!task.isSuccessful()) {
-                    Log.w(TAG, "getInstanceId failed", task.getException());
-                    return;
-                }
-
-                String token = task.getResult().getToken();
-
-                Log.d(TAG,token);
-
-            }
-        });
+//        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+//            @Override
+//            public void onComplete(@NonNull Task<InstanceIdResult> task) {
+//                if (!task.isSuccessful()) {
+//                    Log.w(TAG, "getInstanceId failed", task.getException());
+//                    return;
+//                }
+//
+//                token = task.getResult().getToken();
+//
+//                Log.d(TAG,token);
+//
+//            }
+//        });
 
 
     }
@@ -217,6 +224,7 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... voids) {
+
             retrofit = new Retrofit.Builder().baseUrl(ApiService.API_URL)
                     .client(httpClient)
                     .build();
@@ -241,15 +249,59 @@ public class LoginActivity extends AppCompatActivity {
 
 
                             idValue = putid.getText().toString();
+//
+                            if(token.equals(null)){
+                                Intent LoginIntent = new Intent(LoginActivity.this, MainScreenActivity.class);
+                                LoginIntent.putExtra("NAME",NAME);
+                                LoginIntent.putExtra("id",idValue);
+                                LoginIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                                startActivity(LoginIntent);
+                                failtext.setVisibility(View.GONE);
+
+                            } else{
+                                retrofit = new Retrofit.Builder().baseUrl(ApiService.API_URL)
+                                        .client(httpClient)
+                                        .build();
+                                apiService = retrofit.create(ApiService.class);
+                                HashMap<String, String> push = new HashMap<>();
+                                push.put("USER_ID",idValue);
+                                push.put("OS",OS);
+                                push.put("Token",token);
+
+                                apiService.requestpush(push).enqueue(new Callback<ResponseBody>() {
+                                    @Override
+                                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                        String result = response.body().toString();
+                                        Log.d(TAG,result);
+
+                                        Intent LoginIntent = new Intent(LoginActivity.this, MainScreenActivity.class);
+                                        LoginIntent.putExtra("NAME",NAME);
+                                        LoginIntent.putExtra("id",idValue);
+                                        LoginIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                                        startActivity(LoginIntent);
+                                        failtext.setVisibility(View.GONE);
+
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                        final ErrorDialog errorDialog = new ErrorDialog(LoginActivity.this);
+                                        errorDialog.setErrorDialogListener(new ErrorDialog.ErrorDialogListener() {
+                                            @Override
+                                            public void checkClick() {
+                                                errorDialog.cancel();
+                                            }
+                                        });
+                                        errorDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                                        errorDialog.show();
+                                    }
+                                });
+
+                            }
 
 
 
-                            Intent LoginIntent = new Intent(LoginActivity.this, MainScreenActivity.class);
-                            LoginIntent.putExtra("NAME",NAME);
-                            LoginIntent.putExtra("id",idValue);
-                            LoginIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                            startActivity(LoginIntent);
-                            failtext.setVisibility(View.GONE);
+
 
                         }
                        else{

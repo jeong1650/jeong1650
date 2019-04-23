@@ -3,15 +3,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
     <android.support.v4.widget.SwipeRefreshLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/swipe_wait">
+        android:id="@+id/swipe_wait"
+        android:background="#fbfbfb">
 
 <ScrollView
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/waitscroll">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -36,18 +40,22 @@
                 android:id="@+id/notdata"
                 android:textSize="20dp"/>
 
-        <ListView
-            android:layout_width="match_parent"
-            android:layout_height="700dp"
-            android:id="@+id/w_list"
-            android:dividerHeight="0dp"
-            android:divider="@null">
 
-        </ListView>
         </LinearLayout>
 
+        <ListView
+            android:id="@+id/w_list"
+            android:layout_width="match_parent"
+            android:layout_height="1000dp"
+            android:divider="@null"
+            android:dividerHeight="0dp">
+
+        </ListView>
 
     </LinearLayout>
+
 </ScrollView>
     </android.support.v4.widget.SwipeRefreshLayout>
+
+
 </RelativeLayout>
