@@ -309,18 +309,19 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
                                     try {
                                         String result = response.body().string();
 
-                                        if (!result.equals("[]")) {
-                                            HorizontalCalendarView hv = new HorizontalCalendarView(getActivity());
-                                            hv.getAdapter();
-
-
-                                        } else  {
-
-                                        }
-
-                                        if(isExistdata = true){
-
-                                        }
+//                                        LinearLayout.LayoutParams viewlayout = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+//                                                height);
+//
+//
+//                                        if (!result.equals("[]")) {
+//
+//                                        } else  {
+//
+//                                        }
+//
+//                                        if(isExistdata = true){
+//
+//                                        }
 
                                     } catch (IOException e) {
                                         e.printStackTrace();

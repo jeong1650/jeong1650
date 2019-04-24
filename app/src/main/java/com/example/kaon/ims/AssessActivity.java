@@ -774,10 +774,10 @@ public class AssessActivity extends AppCompatActivity implements View.OnClickLis
                             SharedPreferences pref = getSharedPreferences("pref", AssessActivity.this.MODE_PRIVATE);
                             if(STATUS.equals("1")){
                                 ref_count = pref.getInt("check_count", 0);
-                                Pr_percent.setText("평가 한 문항수 :" + ref_count+"/20");
+                                Pr_percent.setText("평가 한 문항수 :" + ref_count);
                             } else{
                                 int startcount = 0;
-                                Pr_percent.setText("평가 한 문항수 :" + startcount+"/20");
+                                Pr_percent.setText("평가 한 문항수 :" + startcount);
                             }
 
 

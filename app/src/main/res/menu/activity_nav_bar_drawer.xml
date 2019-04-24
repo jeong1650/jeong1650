@@ -19,12 +19,12 @@
 
     </group>
 
-    <item android:title="더 보기">
-        <menu>
+    <!--<item android:title="더 보기">-->
+        <!--<menu>-->
             <!--<item-->
                 <!--android:id="@+id/nav_send"-->
                 <!--android:title="즐겨찾기" />-->
-        </menu>
-    </item>
+        <!--</menu>-->
+    <!--</item>-->
 
 </menu>
